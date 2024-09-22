@@ -1,0 +1,133 @@
+{% extends "!header.html" %}
+
+{% block header_logo %}
+<a href="{{ pathto(master_doc) }}" class="flex items-center mr-6">
+  <svg version="1.0" xmlns="http://www.w3.org/2000/svg" width="50" height="50" viewBox="0 0 177.000000 171.000000"
+    preserveAspectRatio="xMidYMid meet">
+    <g transform="translate(0.000000,171.000000) scale(0.100000,-0.100000)" fill="currentColor" stroke="none">
+      <path d="M821 1600 c-69 -16 -125 -81 -136 -155 -9 -56 19 -122 6  {%- if logo_url %}
+      {%- endif -%}9 -161 20
+    -16 36 -36 36 -44 0 -18 -297 -318 -334 -337 -23 -12 -26 -11 -40 14 -34 66
+    -96 103 -171 103 -110 0 -185 -78 -185 -192 1 -139 142 -224 268 -159 38 19
+    92 84 92 111 0 35 67 -16 240 -184 149 -144 141 -128 88 -184 -53 -56 -72
+    -107 -65 -169 6 -53 29 -87 85 -127 33 -23 51 -29 96 -29 74 0 124 33 160 104
+    47 95 31 149 -76 247 -137 126 -376 364 -387 386 -11 21 -1 33 139 175 l152
+    152 31 -24 c18 -14 92 -82 165 -152 l133 -128 -140 -142 c-87 -87 -141 -149
+    -141 -162 0 -11 11 -29 23 -42 l24 -22 172 173 173 173 12 -36 c29 -83 111
+    -149 187 -149 148 1 243 186 152 298 -49 61 -77 76 -148 80 -53 4 -70 1 -100
+    -18 -42 -26 -95 -94 -95 -122 0 -10 -3 -18 -7 -18 -5 0 -60 53 -123 117 -63
+    65 -148 149 -188 187 -39 37 -72 72 -72 76 0 5 17 17 37 27 20 10 51 35 67 56
+    27 33 31 47 31 97 0 49 -5 65 -30 101 -46 64 -123 96 -194 79z m82 -102 c32
+    -16 46 -39 47 -71 0 -39 -15 -64 -51 -83 -75 -38 -152 55 -103 124 27 38 70
+    50 107 30z m-599 -596 c44 -40 37 -109 -15 -146 -79 -55 -178 51 -119 127 39
+    49 92 56 134 19z m1250 -7 c37 -34 36 -87 -3 -126 -37 -37 -79 -38 -120 -3
+    -25 21 -31 33 -31 67 0 57 30 87 85 87 31 0 49 -7 69 -25z m-638 -559 c53 -53
+    42 -118 -26 -146 -87 -36 -157 83 -87 147 46 42 70 42 113 -1z" />
+      <path d="M355 1421 c-48 -22 -69 -44 -90 -94 -75 -180 144 -348 286 -220 57
+    52 72 86 67 150 -11 135 -145 218 -263 164z m153 -117 c40 -45 26 -111 -29
+    -140 -60 -31 -129 13 -129 82 0 48 9 65 44 80 41 18 86 10 114 -22z" />
+      <path d="M1212 1419 c-73 -37 -120 -135 -102 -214 10 -45 61 -109 104 -129
+    104 -49 240 23 266 140 33 147 -133 272 -268 203z m137 -105 c66 -55 26 -154
+    -61 -154 -83 0 -119 91 -59 151 37 37 79 38 120 3z" />
+      <path d="M365 596 c-147 -68 -159 -262 -20 -338 58 -32 77 -34 142 -12 59 20
+    86 44 112 100 39 82 19 180 -47 231 -29 22 -49 28 -97 30 -36 2 -72 -2 -90
+    -11z m140 -111 c36 -35 34 -88 -4 -126 -72 -72 -186 3 -147 96 17 41 40 54 89
+    55 27 0 45 -7 62 -25z" />
+      <path d="M1200 591 c-43 -22 -89 -85 -96 -132 -19 -116 97 -239 212 -226 58 6
+    118 47 144 97 24 46 27 128 6 168 -16 31 -71 84 -103 101 -34 17 -124 13 -163
+    -8z m149 -107 c80 -67 0 -190 -92 -143 -59 30 -75 102 -32 144 33 34 84 33
+    124 -1z" />
+    </g>
+  </svg>
+
+  <span class="p-2 font-bold font-mono text-xl">algoFuzz</span>
+</a>
+{% endblock header_logo %}
+
+
+{%- block header_right %}
+<div class="flex items-center justify-between flex-1 space-x-2 sm:space-x-4 md:justify-end">
+  {%- if docsearch or hasdoc('search') %}
+  <div class="ml-4">
+    <a href="https://github.com/naghim/algofuzz" target="_blank" rel="noopener noreferrer"
+      class="github-star-btn flex items-center px-3 py-2 rounded-md  transition-colors rounded-md border border-gray-500 px-4">
+      <svg class="w-5 h-5 mr-2" fill="currentColor" viewBox="0 0 24 24" aria-hidden="true">
+        <path fill-rule="evenodd"
+          d="M12 2C6.477 2 2 6.484 2 12.017c0 4.425 2.865 8.18 6.839 9.504.5.092.682-.217.682-.483 0-.237-.008-.868-.013-1.703-2.782.605-3.369-1.343-3.369-1.343-.454-1.158-1.11-1.466-1.11-1.466-.908-.62.069-.608.069-.608 1.003.07 1.531 1.032 1.531 1.032.892 1.53 2.341 1.088 2.91.832.092-.647.35-1.088.636-1.338-2.22-.253-4.555-1.113-4.555-4.951 0-1.093.39-1.988 1.029-2.688-.103-.253-.446-1.272.098-2.65 0 0 .84-.27 2.75 1.026A9.564 9.564 0 0112 6.844c.85.004 1.705.115 2.504.337 1.909-1.296 2.747-1.027 2.747-1.027.546 1.379.202 2.398.1 2.651.64.7 1.028 1.595 1.028 2.688 0 3.848-2.339 4.695-4.566 4.943.359.309.678.92.678 1.855 0 1.338-.012 2.419-.012 2.747 0 .268.18.58.688.482A10.019 10.019 0 0022 12.017C22 6.484 17.522 2 12 2z"
+          clip-rule="evenodd" />
+      </svg>
+      <span class="font-medium">Star on GitHub</span>
+      <span class="ml-2 star-count" data-stars="0" style="min-width: 3ch; text-align: center;">0</span>
+    </a>
+  </div>
+
+  <script>
+    document.addEventListener('DOMContentLoaded', function () {
+      const starBtn = document.querySelector('.github-star-btn');
+      const starCount = starBtn.querySelector('.star-count');
+
+      fetch('https://api.github.com/repos/naghim/algofuzz')
+        .then(response => response.json())
+        .then(data => {
+          const stars = data.stargazers_count;
+          animateValue(starCount, 0, stars, 500);
+        })
+        .catch(error => console.error('Error fetching GitHub stars:', error));
+    });
+
+    function animateValue(obj, start, end, duration) {
+      let startTimestamp = null;
+      const step = (timestamp) => {
+        if (!startTimestamp) startTimestamp = timestamp;
+        const progress = Math.min((timestamp - startTimestamp) / duration, 1);
+        obj.textContent = Math.floor(progress * (end - start) + start);
+        obj.setAttribute('data-stars', obj.textContent);
+        if (progress < 1) {
+          window.requestAnimationFrame(step);
+        }
+      };
+      window.requestAnimationFrame(step);
+    }
+
+  </script>
+
+  <div class="flex-1 w-full md:w-auto md:flex-none">
+    {%- include "searchbox.html" %}
+  </div>
+  {%- endif %}
+
+  {%- block extra_header_link_icons %}
+  <nav class="flex items-center space-x-1">
+    {%- if theme_extra_header_link_icons|tobool %}
+    {%- for text,url in theme_extra_header_link_icons.items() %}
+    {%- if url is mapping %}
+    <a href="{{ url.link }}" title="Visit {{ text }}" rel="noopener nofollow">
+      <div
+        class="inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md disabled:opacity-50 disabled:pointer-events-none hover:bg-accent hover:text-accent-foreground h-9 w-9">
+        {{ url.icon }}
+      </div>
+    </a>
+    {% endif %}
+    {%- endfor %}
+    {%- endif %}
+
+    {%- block theme_switcher %}
+    <button @click="darkMode = darkMode === 'light' ? 'dark' : 'light'"
+      class="relative inline-flex items-center justify-center px-0 text-sm font-medium transition-colors rounded-md hover:bg-accent hover:text-accent-foreground h-9 w-9"
+      type="button" aria-label="Color theme switcher">
+      <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor"
+        class="absolute transition-all scale-100 rotate-0 dark:-rotate-90 dark:scale-0">
+        <path
+          d="M480 685q45.456 0 77.228-31.772Q589 621.456 589 576q0-45.456-31.772-77.228Q525.456 467 480 467q-45.456 0-77.228 31.772Q371 530.544 371 576q0 45.456 31.772 77.228Q434.544 685 480 685Zm0 91q-83 0-141.5-58.5T280 576q0-83 58.5-141.5T480 376q83 0 141.5 58.5T680 576q0 83-58.5 141.5T480 776ZM80 621.5q-19.152 0-32.326-13.174T34.5 576q0-19.152 13.174-32.326T80 530.5h80q19.152 0 32.326 13.174T205.5 576q0 19.152-13.174 32.326T160 621.5H80Zm720 0q-19.152 0-32.326-13.174T754.5 576q0-19.152 13.174-32.326T800 530.5h80q19.152 0 32.326 13.174T925.5 576q0 19.152-13.174 32.326T880 621.5h-80Zm-320-320q-19.152 0-32.326-13.174T434.5 256v-80q0-19.152 13.174-32.326T480 130.5q19.152 0 32.326 13.174T525.5 176v80q0 19.152-13.174 32.326T480 301.5Zm0 720q-19.152 0-32.326-13.17Q434.5 995.152 434.5 976v-80q0-19.152 13.174-32.326T480 850.5q19.152 0 32.326 13.174T525.5 896v80q0 19.152-13.174 32.33-13.174 13.17-32.326 13.17ZM222.174 382.065l-43-42Q165.5 327.391 166 308.239t13.174-33.065q13.435-13.674 32.587-13.674t32.065 13.674l42.239 43q12.674 13.435 12.555 31.706-.12 18.272-12.555 31.946-12.674 13.674-31.445 13.413-18.772-.261-32.446-13.174Zm494 494.761-42.239-43q-12.674-13.435-12.674-32.087t12.674-31.565Q686.609 756.5 705.38 757q18.772.5 32.446 13.174l43 41.761Q794.5 824.609 794 843.761t-13.174 33.065Q767.391 890.5 748.239 890.5t-32.065-13.674Zm-42-494.761Q660.5 369.391 661 350.62q.5-18.772 13.174-32.446l41.761-43Q728.609 261.5 747.761 262t33.065 13.174q13.674 13.435 13.674 32.587t-13.674 32.065l-43 42.239q-13.435 12.674-31.706 12.555-18.272-.12-31.946-12.555Zm-495 494.761Q165.5 863.391 165.5 844.239t13.674-32.065l43-42.239q13.435-12.674 32.087-12.674t31.565 12.674Q299.5 782.609 299 801.38q-.5 18.772-13.174 32.446l-41.761 43Q231.391 890.5 212.239 890t-33.065-13.174ZM480 576Z" />
+      </svg>
+      <svg xmlns="http://www.w3.org/2000/svg" height="24" width="24" viewBox="0 96 960 960" fill="currentColor"
+        class="absolute transition-all scale-0 rotate-90 dark:rotate-0 dark:scale-100">
+        <path
+          d="M480 936q-151 0-255.5-104.5T120 576q0-138 90-239.5T440 218q25-3 39 18t-1 44q-17 26-25.5 55t-8.5 61q0 90 63 153t153 63q31 0 61.5-9t54.5-25q21-14 43-1.5t19 39.5q-14 138-117.5 229T480 936Zm0-80q88 0 158-48.5T740 681q-20 5-40 8t-40 3q-123 0-209.5-86.5T364 396q0-20 3-40t8-40q-78 32-126.5 102T200 576q0 116 82 198t198 82Zm-10-270Z" />
+      </svg>
+    </button>
+    {%- endblock theme_switcher %}
+  </nav>
+  {%- endblock extra_header_link_icons %}
+</div>
+{%- endblock header_right %}

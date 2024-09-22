@@ -225,6 +225,34 @@ DESCRIPTION = "Vina conducted a comparison test of her rule-based system, BEAGLE
 FEATURE_NAMES = ['refractive index', 'Sodium', 'Magnesium', 'Aluminum', 'Silicon', 'Potassium', 'Calcium', 'Barium', 'Iron']
 
 def load_glass():
+    """
+    Load and return the glass dataset.
+
+    The glass dataset is a classic and straightforward dataset often used for
+    classification and/or clustering.
+
+    +------------------------+-------------------------+
+    | Classes                | 6                       |
+    +------------------------+-------------------------+
+    | Samples per class      | [70, 76, 17, 13, 9, 29] |
+    +------------------------+-------------------------+
+    | Samples total          | 214                     |
+    +------------------------+-------------------------+
+    | Dimensionality         | 9                       |
+    +------------------------+-------------------------+
+    | Features               | real, positive          |
+    +------------------------+-------------------------+
+
+    Returns
+    -------
+    data: Bunch
+        Dictionary-like object, the interesting attributes are:
+          - ``data``, the data to learn,
+          - ``target``, the classification labels,
+          - ``target_names``, the meaning of the labels,
+          - ``feature_names``, the meaning of the features,
+          - ``DESCR``, the full description of the dataset.
+    """
     return Bunch(
         data=DATA,
         target=TARGET,

@@ -1,5 +1,5 @@
 from algofuzz.fcm.nonoptimized_fp3cm import NonoptimizedFP3CM
-from algofuzz.fcm.proposed_fcm import STPFCM
+from algofuzz.fcm.stpfcm import STPFCM
 from algofuzz.fcm.nonoptimized_fpcm import NonoptimizedFPCM
 from algofuzz.fcm.possibilistic_fcm import PFCM
 from algofuzz.fcm.fcm import FCM

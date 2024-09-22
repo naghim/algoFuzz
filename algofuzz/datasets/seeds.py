@@ -221,6 +221,33 @@ DESCRIPTION = "The examined group comprised kernels belonging to three different
 FEATURE_NAMES = ['Area', 'Perimeter', 'Compactness', 'Kernel length', 'Kernel width', 'Asymmetry coefficient', 'Kernel groove length']
 
 def load_seeds():
+    """
+    Load and return the seeds dataset.
+
+    The dataset consists of measurements related to wheat kernels. There are three classes, each corresponding to a different variety of wheat.
+
+    +------------------------+-------------------------+
+    | Classes                | 3                       |
+    +------------------------+-------------------------+
+    | Samples per class      | [70, 70, 70]            |
+    +------------------------+-------------------------+
+    | Samples total          | 210                     |
+    +------------------------+-------------------------+
+    | Dimensionality         | 7                       |
+    +------------------------+-------------------------+
+    | Features               | real, positive          |
+    +------------------------+-------------------------+
+
+    Returns
+    -------
+    data: Bunch
+        Dictionary-like object, the interesting attributes are:
+          - ``data``, the data to learn,
+          - ``target``, the classification labels,
+          - ``target_names``, the meaning of the labels,
+          - ``feature_names``, the meaning of the features,
+          - ``DESCR``, the full description of the dataset.
+    """
     return Bunch(
         data=DATA,
         target=TARGET,

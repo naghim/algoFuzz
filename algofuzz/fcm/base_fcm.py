@@ -1,3 +1,15 @@
+"""
+This module contains the base class for all fuzzy c-means (FCM) implementations.
+
+Inheriting from this class provides default implementations of:
+
+- Evaluation metrics: Purity, Adjusted Rand Index, and Normalized Mutual Information
+- Plotting of clusters
+- Centroid initialization
+- Checking if the model is trained
+- Getting information such as the membership matrix, cluster labes, and cluster eta values
+"""
+
 from algofuzz.validation.confusion_matrix import find_best_permutation
 from algofuzz.validation.validity_index import adjusted_rand_index, normalized_mutual_information, purity
 from algofuzz.enums import CentroidStrategy
@@ -6,6 +18,7 @@ from typing import Optional, Literal
 from pydantic import BaseModel, Extra, Field
 from numpy.typing import NDArray
 from sklearn.metrics import confusion_matrix
+from numpy.typing import ArrayLike
 import matplotlib.pyplot as plt
 import numpy as np
 import random
@@ -16,21 +29,65 @@ class BaseFCM(BaseModel):
     """
 
     num_clusters: int = Field(default=5, ge=1)
-    max_iter: int = Field(default=150, ge=1)
-    m: float = Field(default=2.0, gt=1.0) # Fuzzifier parameter
-    centroids: Optional[NDArray] = Field(default=None)
-    centroid_strategy: Optional[CentroidStrategy] = Field(default=CentroidStrategy.Random)
+    """
+    The number of clusters to form. The default value is 5. Must be greater than 0.
+    """
 
-    trained: Literal[bool] = False
+
+    max_iter: int = Field(default=150, ge=1)
+    """
+    The maximum number of iterations to perform. The default value is 150. Must be greater than 0.
+    """
+
+
+    m: float = Field(default=2.0, ge=1.0)
+    """ 
+    The fuzzifier parameter. A value of 1.0 corresponds to hard clustering, while a value greater than 1.0 corresponds to soft clustering. The default value is 2.0. Must be greater than 1.0.
+    """
+
+    centroids: Optional[ArrayLike] = Field(default=None)
+    """
+    The initial centroids of the clusters. If not provided, the centroids will be initialized using the specified strategy.
+    """
+
+    centroid_strategy: Optional[CentroidStrategy] = Field(default=CentroidStrategy.Random)
+    """
+    The strategy to use for initializing the centroids of the clusters. If not provided, the centroids will be initialized randomly.
+    """
+
+    trained: bool = False
+    """
+    A flag indicating whether the model has been trained. The default value is False.
+    """
 
     class Config:
         extra = Extra.allow
         arbitrary_types_allowed = True
 
     def fit(self, X: NDArray) -> None:
+        """
+        Fits the FCM model to the data.
+
+        Parameters:
+            X (np.ndarray): The input data.
+        Returns:
+            None
+        """
         raise NotImplementedError()
 
     def evaluate(self, true_labels: NDArray) -> list[float]:
+        """
+        Evaluate the clustering results. Currently uses the true labels of the dataset to perform the evaluations.
+
+        Parameters:
+            true_labels (np.ndarray): The true labels of the dataset.
+
+        Returns:
+            list[float]: A list containing the following evaluation metrics:
+                - Purity
+                - Adjusted Rand Index
+                - Normalized Mutual Information
+        """
         if not self.is_trained():
             raise NotTrainedException()
 
@@ -44,9 +101,25 @@ class BaseFCM(BaseModel):
         return pur, ari, nmi
 
     def is_trained(self) -> bool:
+        """
+        Check if the model has been trained.
+
+        Parameters:
+            None
+        Returns:
+            bool: True if the model has been trained, False otherwise.
+        """
         return self.trained
 
     def plot_clusters(self, X: NDArray) -> None:
+        """
+        Plot the clusters in a 2D space.
+
+        Parameters:
+            X (np.ndarray): The data points.
+        Returns:    
+            None
+        """
         if not self.is_trained():
             raise NotTrainedException()
 

@@ -3,6 +3,10 @@ __pycache__/
 *.py[cod]
 *$py.class
 
+# VSCode
+*.workspace
+build.sh
+
 # C extensions
 *.so
 
@@ -49,6 +53,7 @@ coverage.xml
 *.py,cover
 .hypothesis/
 .pytest_cache/
+output/
 cover/
 
 # Translations

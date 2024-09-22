@@ -1,10 +1,24 @@
+"""
+This model is an extension of the FCM model that includes a penalty term (eta) for each cluster: provides the default implementation of the fit method that calculates the eta parameter for each cluster based on the membership matrix and the centroids of the clusters. 
+"""
+
 from algofuzz.fcm.fcm import FCM
 from numpy.typing import NDArray
 import numpy as np
 
 class EtaFCM(FCM):
-
+    """
+    An extension of the FCM model that includes a penalty term (eta) for each cluster depending on the distance between the data points and the centroids of the clusters.
+    """
     def fit(self, X: NDArray) -> None:
+        """
+        Fits the model to the data.
+        
+        Parameters:
+            X (NDArray): The input data.
+        Returns:
+            None
+        """
         FCM.fit(self, X)
 
         n = X.shape[1]

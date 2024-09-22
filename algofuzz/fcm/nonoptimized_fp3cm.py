@@ -1,3 +1,7 @@
+"""
+This module contains the implementation of the Fuzzy Possibilistic Product Partition C-Means Clustering algorithm proposed by L. Szilágyi & S. Szilágyi in 2014.
+"""
+
 from numpy.typing import NDArray
 from pydantic import Field
 from algofuzz.fcm.base_fcm import BaseFCM
@@ -5,11 +9,29 @@ from algofuzz.exceptions import NotTrainedException
 import numpy as np
 
 class NonoptimizedFP3CM(BaseFCM):
-    p: float = Field(default=2.0, gt=1.0) # Exponent
-    eta: float = Field(default=0.1, ge=1e-9) # Learning rate
+    """
+    Partitions a numeric dataset using the Fuzzy Possibilistic Product Partition C-Means (FP3CM).
+    """
+    p: float = Field(default=2.0, gt=1.0)
+    """
+    The fuzzy exponent parameter. The default value is 2.0. Must be greater than 1.
+    """
+
+    eta: float = Field(default=0.1, ge=1e-9) 
+    """
+    The penalty factor for the noise cluster. The default value is 0.1. Must be greater than or equal to 1e-9.
+    """
 
     def fit(self, X: NDArray) -> None:
-        # x, y dimensions
+        """
+        Fits the model to the data.
+
+        Parameters:
+            X (NDArray): The input data.
+        Returns:
+            None
+        """
+
         z = X.shape[0]
         n = X.shape[1]
 

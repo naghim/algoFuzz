@@ -1,3 +1,8 @@
+"""
+This module contains the implementation of the ST-PFCM algorithm, which is a self-tuning version of the Possibilistic Fuzzy C-Means Clustering algorithm proposed by MB. Naghi in 2023.
+"""
+
+
 from numpy.typing import NDArray
 from pydantic import Field
 from algofuzz.fcm.base_fcm import BaseFCM
@@ -5,11 +10,36 @@ from algofuzz.exceptions import NotTrainedException
 import numpy as np
 
 class STPFCM(BaseFCM):
+    """
+    Partitions a numeric dataset using the Self-Tuning Possibilistic Fuzzy C-Means Clustering (ST-PFCM) algorithm.
+    """
     p: float = Field(default=2.0, gt=1.0) # Exponent
+    """
+    The fuzzy exponent parameter. The default value is 2.0. Must be greater than 1.
+    """
+
     kappa: float = Field(default=1, ge=1e-9) # Kappa
-    weight: float = Field(default=1.0, gt=0.0) # a
+    """
+    The penalty factor for the noise cluster. The default value is 1. Must be greater than or equal to 1e-9.
+    """
+
+    w_prob: float = Field(default=1.0, gt=0.0) # a
+    """ 
+    Balancing factor, controls the influence of the probabilistic membership u in the clustering process. A higher weight increases the importance of u in updating the centroids.
+
+    The default value is 1.0. Must be greater than 0.
+    """
 
     def fit(self, X: NDArray) -> None:
+        """
+        Fits the model to the data.
+        
+        Parameters:
+            X (NDArray): The input data.
+        Returns:
+            None
+        """
+
         z = X.shape[0]
         n = X.shape[1]
 
@@ -57,7 +87,7 @@ class STPFCM(BaseFCM):
                 u[:, k] /= np.sum(u[:, k])
 
             # new alpha
-            alpha = np.sum((self.weight * u ** self.m + t ** self.p) * np.transpose(np.linalg.norm(X[:, :, np.newaxis] - self.centroids[:, np.newaxis, :], axis=0) ** 2), axis=1) ** (1 / self.m)
+            alpha = np.sum((self.w_prob * u ** self.m + t ** self.p) * np.transpose(np.linalg.norm(X[:, :, np.newaxis] - self.centroids[:, np.newaxis, :], axis=0) ** 2), axis=1) ** (1 / self.m)
             alpha /= np.sum(alpha)
 
             # new v
@@ -66,14 +96,14 @@ class STPFCM(BaseFCM):
                 sumdn = np.zeros(z)
 
                 for k in range(n):
-                    sumcur = (self.weight * u[i, k] ** self.m + t[i, k] ** self.p)
+                    sumcur = (self.w_prob * u[i, k] ** self.m + t[i, k] ** self.p)
                     sumup += sumcur * X[:, k]
                     sumdn += sumcur
 
                 self.centroids[:, i] = sumup / sumdn
 
         self._eta = eta2 * (alpha ** (self.m - 1))
-        self._member = self.weight * u ** self.m + t ** self.p
+        self._member = self.w_prob * u ** self.m + t ** self.p
         self._alpha = alpha
         self.trained = True
 

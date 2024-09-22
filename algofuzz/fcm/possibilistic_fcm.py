@@ -1,3 +1,7 @@
+"""
+This module contains the implementation of the Possibilistic Fuzzy C-Means Clustering algorithm proposed by Pal et al. in 2005.
+"""
+
 from numpy.typing import NDArray
 from pydantic import Field
 from algofuzz.fcm.base_fcm import BaseFCM
@@ -5,12 +9,43 @@ from algofuzz.fcm.eta_fcm import EtaFCM
 import numpy as np
 
 class PFCM(BaseFCM):
+    """
+    Partitions a numeric dataset using the Possibilistic Fuzzy C-Means Clustering (PFCM) algorithm.
+    """
     preprocess_iter: int = Field(default=15, ge=1)
-    p: float = Field(default=2.0, gt=1.0) # Exponent
-    weight: float = Field(default=1.0, gt=0.0) # a
-    b: float = Field(default=1.0, gt=0.0) # b
+    """
+    Number of preprocessing iterations. The default value is 15. Must be greater than or equal to 1.
+    """
+
+    p: float = Field(default=2.0, gt=1.0)
+    """
+    The fuzzy exponent parameter. The default value is 2.0. Must be greater than 1.
+    """
+
+    w_pos: float = Field(default=1.0, gt=0.0) # a
+    """ 
+    Balancing factor, controls the influence of the possibilistic membership t in the clustering process. 
+    
+    The default value is 1.0. Must be greater than 0.
+    """
+
+    w_prob: float = Field(default=1.0, gt=0.0) # b
+    """
+    Balancing factor, controls the influence of the probabilistic membership u in the clustering process. 
+    
+    The default value is 1.0. Must be greater than 0.
+    """
 
     def fit(self, X: NDArray) -> None:
+        """
+        Fits the model to the data.
+        
+        Parameters:
+            X (NDArray): The input data.
+        Returns:
+            None
+        """
+
         z = X.shape[0]
         n = X.shape[1]
         u = np.zeros((self.num_clusters, n))
@@ -54,7 +89,7 @@ class PFCM(BaseFCM):
             # new t
             for i in range(self.num_clusters):
                 for k in range(n):
-                    t[i, k] = 1 / (1 + ((np.linalg.norm(X[:, k] - self.centroids[:, i]) ** 2) * self.b / self._eta[i]) ** corrected_p)
+                    t[i, k] = 1 / (1 + ((np.linalg.norm(X[:, k] - self.centroids[:, i]) ** 2) * self.w_prob / self._eta[i]) ** corrected_p)
 
             # new v
             for i in range(self.num_clusters):
@@ -62,11 +97,11 @@ class PFCM(BaseFCM):
                 sumdn = np.zeros(z)
 
                 for k in range(n):
-                    sumcur = (self.weight * u[i, k] ** self.m + self.b * t[i, k] ** self.p)
+                    sumcur = (self.w_pos * u[i, k] ** self.m + self.w_prob * t[i, k] ** self.p)
                     sumup += sumcur * X[:, k]
                     sumdn += sumcur
 
                 self.centroids[:, i] = sumup / sumdn
 
-        self._member = self.weight * u ** self.m + self.b * t ** self.p
+        self._member = self.w_pos * u ** self.m + self.w_prob * t ** self.p
         self.trained = True

@@ -1,3 +1,7 @@
+"""
+This module contains the implementation of the Fuzzy C-Means algorithm, proposed by Dunn in 1973 and improved by Bezdek in 1981.
+"""
+
 from algofuzz.fcm.base_fcm import BaseFCM
 from numpy.typing import NDArray
 from pydantic import Field
@@ -5,10 +9,35 @@ from typing import Optional
 import numpy as np
 
 class FCM(BaseFCM):
-    kappa: float = Field(default=1.0, gt=1.0) # Kappa
+    """
+    Partitions a numeric dataset using the Fuzzy C-Means (FCM) algorithm. 
+    """
+
+    kappa: float = Field(default=1.0, ge=1.0)
+    """
+    Regulates the severity of the penalty factor eta. The default value is 1.0. Must be greater than or equal to 1.
+    """
+
     noise: Optional[float] = Field(default=0.0, gte=0.0) # temporary
+    """ 
+    (optional) A single vector will be added to the dataset. This noise vector will retain the same value given for all data points. 
+    
+    The default value is 0.0. Must be greater than or equal to 0.0. If None, no noise will be added.
+    
+    For example, if noise=2, a noise vector of [2, 2, 2, ...] will be added to the dataset based on the dimensionality of the dataset.
+    """ 
+    
 
     def fit(self, X: NDArray) -> None:
+        """
+        Fits the model to the data.
+        
+        Parameters:
+            X (NDArray): The input data.
+        Returns:
+            None
+        """
+
         if self.noise is not None:
             noisy_value = np.full((X.shape[0], 1), self.noise)
             X = np.append(X, noisy_value, axis=1)

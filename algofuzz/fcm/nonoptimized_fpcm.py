@@ -1,3 +1,7 @@
+"""
+This module contains the implementation of the Fuzzy-Possibilistic C-Means Clustering algorithm proposed by Pal, Pal and Bezdek in 1997.
+"""
+
 from algofuzz.fcm.base_fcm import BaseFCM
 from numpy.typing import NDArray
 from pydantic import Field
@@ -5,11 +9,40 @@ import numpy as np
 from typing import Optional
 
 class NonoptimizedFPCM(BaseFCM):
-    p: float = Field(default=2.0, gt=1.0) # Exponent
-    beta: float = Field(default=1.0, gte=0.0) # Beta
-    noise: Optional[float] = Field(default=0.0, gte=0.0) # temporary
+    """
+    Partitions a numeric dataset using the Fuzzy-Possibilistic C-Means Clustering (FPCM) algorithm.
+    """
+    p: float = Field(default=2.0, gt=1.0) 
+    """
+    The fuzzy exponent parameter. The default value is 2.0. Must be greater than 1.
+    """
+
+    w_prob: float = Field(default=1.0, gte=0.0) 
+    """
+    Serves as a balancing factor: w_prob is used to weigh the influence of the second membership term t (possibilistic) relative to u (probabilistic). A larger w_prob gives more weight to the influence of the probabilistic term, whereas a smaller w_prob gives more importance to the probabilistic term. 
+    
+    The default value is 1.0. Must be greater than or equal to 0.
+    """
+
+    noise: Optional[float] = Field(default=0.0, gte=0.0) 
+    """ 
+    (optional) A single vector will be added to the dataset. This noise vector will retain the same value given for all data points. 
+    
+    The default value is 0.0. Must be greater than or equal to 0.0. If None, no noise will be added.
+    
+    For example, if noise=2, a noise vector of [2, 2, 2, ...] will be added to the dataset based on the dimensionality of the dataset.
+    """ 
 
     def fit(self, X: NDArray) -> None:
+        """
+        Fits the model to the data.
+        
+        Parameters:
+            X (NDArray): The input data.
+        Returns:
+            None
+        """
+
         if self.noise is not None:
             noisy_value = np.full((X.shape[0], 1), self.noise)
             X = np.append(X, noisy_value, axis=1)
@@ -66,12 +99,12 @@ class NonoptimizedFPCM(BaseFCM):
                 sumdn = np.zeros(z)
 
                 for k in range(n):
-                    sumcur = (u[i, k] ** self.m) + (self.beta * (t[i, k] ** self.p))
+                    sumcur = (u[i, k] ** self.m) + (self.w_prob * (t[i, k] ** self.p))
                     sumup += sumcur * X[:, k]
                     sumdn += sumcur
 
                 self.centroids[:, i] = sumup / sumdn
 
         self._eta = None
-        self._member = u ** self.m + self.beta * t ** self.p
+        self._member = u ** self.m + self.w_prob * t ** self.p
         self.trained = True

@@ -9,7 +9,7 @@ from algofuzz.fcm.fcplus1m import FCPlus1M
 from algofuzz.fcm.nonoptimized_fp3cm import NonoptimizedFP3CM
 from algofuzz.fcm.nonoptimized_fpcm import NonoptimizedFPCM
 from algofuzz.fcm.possibilistic_fcm import PFCM
-from algofuzz.fcm.proposed_fcm import STPFCM
+from algofuzz.fcm.stpfcm import STPFCM
 
 def load_dataset(dataset: DatasetType, num_clusters: int=3, offset: int = 1):
     if dataset == DatasetType.Iris:

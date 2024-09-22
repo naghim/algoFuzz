@@ -1,0 +1,12 @@
+sphinx
+pydata-sphinx-theme
+sphinx-autodoc-typehints
+myst-parser
+sphinx-copybutton
+sphinx-design
+sphinx-inline-tabs
+sphinx-togglebutton
+sphinx-autobuild
+sphinxcontrib-mermaid
+sphinxawesome_theme
+autodoc_pydantic

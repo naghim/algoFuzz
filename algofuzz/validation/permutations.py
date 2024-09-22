@@ -2,6 +2,9 @@ from itertools import permutations
 import numpy as np
 
 def find_best_permutation(confusion):
+    """
+    Find the best permutation of the confusion matrix.
+    """
     c = confusion.shape[0]
     best_accuracy = 0
     best_permuted_confusion = None
