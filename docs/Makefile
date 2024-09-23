@@ -7,13 +7,15 @@ SPHINXOPTS    ?=
 SPHINXBUILD   ?= sphinx-build
 SOURCEDIR     = src
 BUILDDIR      = _build
+SHELL	      := /bin/bash
 
 # Put it first so that "make" without argument is like "make help".
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
 autobuild:
-	sphinx-autobuild "$(SOURCEDIR)" "$(BUILDDIR)"
+	if ! [[ -d ../venv ]]; then python3 -m venv ../venv; fi
+	source ../venv/bin/activate && sphinx-autobuild "$(SOURCEDIR)" "$(BUILDDIR)"
 
 .PHONY: help autobuild Makefile
 

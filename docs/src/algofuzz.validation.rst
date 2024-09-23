@@ -12,14 +12,6 @@ algofuzz.validation.confusion\_matrix module
    :undoc-members:
    :show-inheritance:
 
-algofuzz.validation.permutations module
----------------------------------------
-
-.. automodule:: algofuzz.validation.permutations
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
 algofuzz.validation.validity\_index module
 ------------------------------------------
 

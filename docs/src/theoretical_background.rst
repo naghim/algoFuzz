@@ -1,5 +1,7 @@
+.. _theoreticalbackground:
+
 Fuzzy Clustering Overview
-======================
+=========================
 
 Fuzzy clustering is a form of clustering in which each data point can belong to multiple clusters with varying degrees of membership. This contrasts with traditional hard clustering methods, where each point is assigned to a single cluster.
 

@@ -39,7 +39,7 @@ Citing algoFuzz in Publications
       title        = {algoFuzz: Fuzzy C-Means Clustering Framework},
       author       = {Naghi Mirtill Boglárka},
       year         = {2024},
-      howpublished = {\url{https://example.com/algofuzz}},
+      howpublished = {\url{https://algofuzz.naghi.me}},
       note         = {Accessed: 2024-09-23}
    }
 

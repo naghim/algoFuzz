@@ -24,7 +24,7 @@ Troubleshooting
 ---------------
 
 - Update pip: ``pip install --upgrade pip``
-- Use virtual environment
+- Use a virtual environment like ``venv``
 - Try ``pip3`` instead of ``pip``
 - Use ``sudo`` (Unix) or run as administrator (Windows) if permission errors occur
 

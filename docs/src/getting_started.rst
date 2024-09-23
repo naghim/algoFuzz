@@ -8,7 +8,7 @@ Prerequisites
 ---------------------------------
 Before you start using the algoFuzz library, ensure that you have the following prerequisites:
 
-- **Python 3.7+** installed on your system.
+- **Python 3.8+** installed on your system.
 - Familiarity with clustering concepts.
 - A basic understanding of Python programming.
 
@@ -30,82 +30,138 @@ Alternatively, you can also install the library directly from the source if it's
 
 Make sure to check the `official repository <https://github.com/naghim/algofuzz>`_ for the latest updates and releases.
 
-Quick Example
----------------------------------
+Quick example
+-------------
 
 Here's a basic example of how to use the Fuzzy C-Means (FCM) algorithm to cluster data.
 
-.. code-block:: python
+Imports
+=======
 
-    import numpy as np
-    import matplotlib.pyplot as plt
-    from algofuzz import FCM
-    
-    # Generate random data points
-    np.random.seed(0)
-    data = np.random.rand(100, 2)
-    
-    # Create an FCM model with 3 clusters
-    fcm = FCM(n_clusters=3, max_iter=100)
-    fcm.fit(data)
-    
-    # Get cluster centers
-    centers = fcm.get_centers()
-    
-    # Plot the clusters
-    plt.scatter(data[:, 0], data[:, 1], c=fcm.predict(data))
-    plt.scatter(centers[:, 0], centers[:, 1], c='red', marker='x', s=100)
-    plt.show()
-
-Explanation
------------
-
-- **Step 1:** We import the necessary modules, including FCM from the algoFuzz library.
-- **Step 2:** We generate some random data points for clustering.
-- **Step 3:** We create an FCM object, specifying the number of clusters (in this case, 3).
-- **Step 4:** The `fit` method is used to compute clusters and membership values based on the input data.
-- **Step 5:** Finally, we visualize the clusters using a scatter plot.
-
-Parameters
-==========
-
-- **n_clusters**: (int) The number of clusters you want to segment the data into.
-- **max_iter**: (int) Maximum number of iterations to run the FCM algorithm. Default is 150.
-- **m**: (float) The fuzziness coefficient. Must be greater than 1. Default is 2.0.
-- **error**: (float) The stopping criterion for the algorithm. Default is 1e-5.
-
-Example:
+For starters, let's import the necessary classes. You can use the following code snippet to get started:
 
 .. code-block:: python
 
-   fcm = FCM(n_clusters=4, m=1.5, max_iter=200, error=1e-4)
+   from algofuzz import FCM
+   from algofuzz import CentroidStrategy, DatasetType, load_dataset, generate_colors
+   import numpy as np
+   import matplotlib.pyplot as plt
+   import random
 
-Advanced Usage
-==============
+Your imports may be different depending on the specific algorithm you are using.
 
-You can customize the behavior of the algorithms by tuning additional parameters, such as the fuzziness coefficient ``m`` or the maximum number of iterations. You can also set your own initial cluster centers using the ``centroids`` parameter or set the stra  initializing the cluster centers using the ``centroid_strategy`` parameter. access the cluster centers and membership values after fitting the model. 
+Loading a dataset
+=================
 
-Here is how to do it in case of FCM:
+Next, let's load a dataset to work with. You can use the ``load_dataset`` function to load a toy dataset from the library. You can also replace this with your own dataset. Datasets can be more or less substituted with simple numpy arrays.
 
-Example:
+**Note**: The ``load_dataset`` function returns the data points, number of clusters, and true labels for the dataset.
+
+**Warning**: If you are using your own dataset, make sure to ensure that the dimensions of the data points are consistent with the algorithm you are using. It might be necessary to transpose the data (``data.T``) before passing it to the algorithm.
 
 .. code-block:: python
 
-   # Custom FCM model
-   fcm = FCM(n_clusters=5, m=2.5, max_iter=300)
+   # Choose a random seed for reproducibility
+   np.random.seed(0)
+
+   # Load the Bubbles toy dataset
+   # You can replace this with your own dataset as well
+   data, num_clusters, true_labels = load_dataset(DatasetType.Bubbles)
+
+   # There are 3 clusters
+   print(f'Number of clusters: {num_clusters}')
+
+Choosing a clustering algorithm
+===============================
+
+Now, let's choose a clustering algorithm to segment the data. You may choose from the following algorithms currently available in the library:
+
+1. :py:mod:`algofuzz.fcm.fcm`: Fuzzy C-Means (FCM) algorithm, proposed by Dunn in 1973 and improved by Bezdek in 1981.
+2. :py:mod:`algofuzz.fcm.possibilistic_fcm`: Possibilistic Fuzzy C-Means Clustering algorithm proposed by Pal et al. in 2005.
+3. :py:mod:`algofuzz.fcm.eta_fcm`: An extension of the FCM model that includes a penalty term (eta) for each cluster depending on the distance between the data points and the centroids of the clusters.
+4. :py:mod:`algofuzz.fcm.fcplus1m`: A Fuzzy C-Means algorithm with an extra noise cluster proposed by R. Dave in 1993.
+5. :py:mod:`algofuzz.fcm.nonoptimized_fp3cm`: Fuzzy Possibilistic Product Partition C-Means Clustering algorithm proposed by L. Szilágyi & S. Szilágyi in 2014.
+6. :py:mod:`algofuzz.fcm.nonoptimized_fpcm`: Fuzzy-Possibilistic C-Means Clustering algorithm proposed by Pal, Pal and Bezdek in 1997.
+7. :py:mod:`algofuzz.fcm.stpfcm`: Self-tuning version of the Possibilistic Fuzzy C-Means Clustering algorithm proposed by MB. Naghi in 2023.
+
+To use any of these algorithms, you can import them as follows:
+
+.. code-block:: python
+   
+   from algofuzz import FCM
+   from algofuzz import PFCM
+   from algofuzz import EtaFCM
+   from algofuzz import FCPlus1M
+   from algofuzz import NonOptimizedFP3CM
+   from algofuzz import NonOptimizedFPCM
+   from algofuzz import STPFCM
+
+Now, let's create an instance of the FCM algorithm and fit it to the data. We will use the ``fit`` method to compute the clusters and membership values based on the input data.
+
+To finetune the algorithm, you can set the parameters such as the number of clusters, maximum number of iterations, and other parameters when creating the algorithm object. Please check the documentation of the chosen algorithm for more details.
+
+.. code-block:: python
+
+   # Create an FCM model with 3 clusters, choosing random initial centroids
+   fcm = FCM(
+      num_clusters=num_clusters,
+      max_iter=100,
+      centroid_strategy=CentroidStrategy.Random
+   )
+
+Fitting the data
+================
+
+Next, we fit the model to the data using the ``fit`` method. This will compute the clusters and membership values based on the input data.
+
+.. code-block:: python
+
+   # Fit the model to the data
    fcm.fit(data)
 
-   # Get cluster centers
-   centers = fcm.get_centers()
-   print("Cluster Centers:", centers)
+   # These are the centroids of the clusters
+   centers = fcm.centroids
 
-Further Reading
-===============
+   # These are the labels assigned to each data point (there are 3 clusters)
+   labels = fcm.labels
 
-Visit the `Theoretical background <https://en.wikipedia.org/wiki/Fuzzy_clustering>`_ page for more information about this topic.
+Visualizing the clusters
+========================
 
-Need Help?
-==========
+Finally, we visualize the clusters using a scatter plot. We generate random colors for each cluster and plot the data points along with the cluster centers.
+
+.. code-block:: python
+
+   # Plot the clusters
+   colors = generate_colors(num_clusters)
+   plt.figure(figsize=(8, 6))
+
+   for i in range(num_clusters):
+      cluster_points = data[:, labels[:data.shape[1]] == i]
+      plt.scatter(cluster_points[0], cluster_points[1], c=colors[i], label=f'Cluster {i+1}')
+
+   for i in range(num_clusters):
+      plt.scatter(centers[0][i], centers[1][i], marker='x', c='black', s=100)
+
+   plt.xlabel('Feature 1')
+   plt.ylabel('Feature 2')
+   plt.title('Clusters')
+   plt.legend()
+   plt.axis('equal')
+   plt.show()
+
+
+.. image:: clusters.png
+  :align: center
+  :alt: Clusters plotted using the library
+
+Further reading
+---------------
+
+Visit the :ref:`theoreticalbackground` page for more information about this topic.
+
+Need help?
+----------
 
 If you encounter any issues or need further clarification, feel free to reach out via:
 
