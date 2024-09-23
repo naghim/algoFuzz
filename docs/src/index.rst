@@ -1,9 +1,6 @@
-
-
-
-===========================================
+============================================
 algoFuzz: Fuzzy C-Means Clustering Framework
-===========================================
+============================================
 
 .. title:: Introduction
 
@@ -11,9 +8,8 @@ algoFuzz: Fuzzy C-Means Clustering Framework
 
 If you're new to fuzzy clustering or looking to learn more about the algorithms and techniques supported by ``algoFuzz``, check out the :doc:`Getting Started <getting_started>` section for a quick introduction and example usage. You can also refer to the :doc:`API Reference <reference/index>` for detailed information on the available algorithms, parameters, and methods.
 
-
 Key Features
------
+------------
 
 - It is built on top of the popular `scikit-learn <https://scikit-learn.org/stable/index.html>`_ library, leveraging its robust data processing and machine learning capabilities. It **aims to bridge the gap between theoretical research and practical application**, enabling users to experiment with cutting-edge clustering algorithms in a user-friendly and accessible manner. 
 
@@ -31,7 +27,6 @@ If you found the framework useful you can star the project on GitHub to show you
 
 Citing algoFuzz in Publications
 ---------------------------------------------------
-
 
 .. code-block:: bibtex
 
@@ -59,13 +54,18 @@ Indices and tables
 
 .. toctree::
    :maxdepth: 3
-   :caption: The Basics:
+   :caption: The Basics
    :hidden:
-
-   Introduction <self>
    
    installation
    getting_started
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Advanced
+   :hidden:
+
+   theoretical_background
    
 .. toctree::
    :maxdepth: 1
