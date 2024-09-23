@@ -19,5 +19,5 @@ setuptools.setup(
         'Operating System :: OS Independent',
         'Topic :: System :: Clustering',
     ],
-    python_requires='>=3.6',
+    python_requires='>=3.8',
 )
