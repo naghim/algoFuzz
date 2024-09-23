@@ -14,6 +14,14 @@ Subpackages
 Submodules
 ----------
 
+algofuzz.colors module
+--------------------
+
+.. automodule:: algofuzz.colors
+   :members:
+   :undoc-members:
+   :show-inheritance:
+
 algofuzz.enums module
 ---------------------
 
@@ -34,14 +42,6 @@ algofuzz.param\_tester module
 -----------------------------
 
 .. automodule:: algofuzz.param_tester
-   :members:
-   :undoc-members:
-   :show-inheritance:
-
-algofuzz.util module
---------------------
-
-.. automodule:: algofuzz.util
    :members:
    :undoc-members:
    :show-inheritance:
