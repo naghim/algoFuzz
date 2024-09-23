@@ -57,6 +57,8 @@ Indices and tables
    :caption: The Basics
    :hidden:
    
+   Introduction <self>
+
    installation
    getting_started
 
