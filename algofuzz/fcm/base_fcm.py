@@ -61,7 +61,7 @@ class BaseFCM(BaseModel):
     """
 
     class Config:
-        extra = Extra.allow
+        extra = Extra.forbid
         arbitrary_types_allowed = True
 
     def fit(self, X: NDArray) -> None:

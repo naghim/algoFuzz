@@ -1,13 +1,7 @@
-from algofuzz.fcm.nonoptimized_fp3cm import NonoptimizedFP3CM
-from algofuzz.fcm.stpfcm import STPFCM
-from algofuzz.fcm.nonoptimized_fpcm import NonoptimizedFPCM
-from algofuzz.fcm.possibilistic_fcm import PFCM
-from algofuzz.fcm.fcm import FCM
-from algofuzz.fcm.fcplus1m import FCPlus1M
-from algofuzz.validation.confusion_matrix import find_best_permutation
-from algofuzz.validation.validity_index import purity, normalized_mutual_information, adjusted_rand_index
+from algofuzz.fcm import *
+from algofuzz.validation import find_best_permutation, purity, normalized_mutual_information, adjusted_rand_index
 from algofuzz.enums import CentroidStrategy, DatasetType, FCMType
-from algofuzz.util import load_dataset
+from algofuzz.datasets import load_dataset
 from sklearn.metrics import confusion_matrix
 import numpy as np
 

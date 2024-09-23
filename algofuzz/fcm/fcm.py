@@ -88,6 +88,7 @@ class FCM(BaseFCM):
         self._eta = None
         self._member = u
         self.trained = True
+        print(self.centroids)
 
     def calculate_initial_sum(self):
         return 0

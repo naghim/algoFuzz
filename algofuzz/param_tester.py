@@ -1,4 +1,6 @@
-from algofuzz.util import get_fcm_by_type, load_dataset
+from algofuzz.datasets import load_dataset
+from algofuzz.exceptions import MultivariateParamTesterException
+from algofuzz.fcm import get_fcm_by_type
 from scipy.io import savemat
 from itertools import product
 from p_tqdm import p_map
@@ -9,8 +11,7 @@ import csv
 import traceback
 import random
 
-class MultivariateParamTesterException(Exception):
-    pass
+__all__ = ['MultivariateParamTester']
 
 class MultivariateParamTester(object):
     """

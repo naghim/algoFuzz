@@ -1,4 +1,9 @@
+__all__ = ['AlgofuzzException', 'MultivariateParamTesterException', 'NotTrainedException']
+
 class AlgofuzzException(Exception):
+    pass
+
+class MultivariateParamTesterException(AlgofuzzException):
     pass
 
 class NotTrainedException(AlgofuzzException):
