@@ -1,6 +1,6 @@
 # algoFuzz
 
-[![Documentation](https://img.shields.io/readthedocs/algofuzz)](https://algofuzz.readthedocs.io)
+[![Documentation](https://img.shields.io/readthedocs/algofuzz)](https://algofuzz.naghi.me)
 
 [![PyPI version](https://img.shields.io/pypi/v/algofuzz.svg)](https://pypi.python.org/pypi/algofuzz/)
 
@@ -8,7 +8,7 @@ algoFuzz is a unique framework dedicated to the implementation and comparison of
 
 # Documentation
 
-The full documentation for algoFuzz is available at [Read the Docs](https://algofuzz.readthedocs.io). You should read the documentation before using algoFuzz.
+The full documentation for algoFuzz is available at [Read the Docs](https://algofuzz.naghi.me). You should read the documentation before using algoFuzz.
 
 # Getting Started
 
@@ -36,7 +36,7 @@ pip install .
 
 Here’s a basic example of how to use the Fuzzy C-Means (FCM) algorithm to cluster data.
 
-Refer to the [documentation](https://algofuzz.readthedocs.io/en/latest/getting_started.html) for a thorough explanation.
+Refer to the [documentation](https://algofuzz.naghi.me/en/latest/getting_started.html) for a thorough explanation.
 
 ```python
 from algofuzz import FCM

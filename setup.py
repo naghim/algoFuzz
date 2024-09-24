@@ -8,7 +8,7 @@ with open('requirements.txt') as f:
 
 setuptools.setup(
     name='algofuzz',
-    version='0.1.0',
+    version='0.1.1',
     author='naghim',
     author_email='naghi.mirtill@gmail.com',
     description='Framework for popular fuzzy c-means clustering algorithms from literature',
