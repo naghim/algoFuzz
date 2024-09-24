@@ -3,15 +3,19 @@ import setuptools
 with open('README.md', 'r') as f:
     long_description = f.read()
 
+with open('requirements.txt') as f:
+    required = f.read().splitlines()
+
 setuptools.setup(
     name='algofuzz',
-    version='0.0.1',
+    version='0.1.0',
     author='naghim',
     author_email='naghi.mirtill@gmail.com',
     description='Framework for popular fuzzy c-means clustering algorithms from literature',
     long_description=long_description,
     long_description_content_type='text/markdown',
     url='https://github.com/naghim/algofuzz',
+    install_requires=required,
     packages=setuptools.find_packages(),
     classifiers=[
         'Development Status :: 1 - Planning',
