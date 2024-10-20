@@ -103,3 +103,7 @@ You may choose from the following algorithms currently available in the library:
 7. Self-tuning version of the Possibilistic Fuzzy C-Means Clustering algorithm proposed by MB. Naghi in 2023.
 
 - `from algofuzz import STPFCM`
+
+8. Generalized Fuzzy-Possibilistic C-Means Clustering algorithm proposed by MB. Naghi in 2023.
+
+- `from algofuzz import NonOptimizedGFPCM`

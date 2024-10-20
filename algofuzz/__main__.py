@@ -65,8 +65,9 @@ def test_kappa(dataset: DatasetType):
     plt.axis('equal')
     plt.show()
 
-def main(dataset: DatasetType, fcm: FCMType, centroid_strategy: CentroidStrategy):
-    # np.random.seed(0)
+def main(deterministic: bool, dataset: DatasetType, fcm: FCMType, centroid_strategy: CentroidStrategy):
+    if deterministic:
+        np.random.seed(0)
 
     X, c, true_labels = load_dataset(dataset)
     m = 2 # Fuzzifier parameter
@@ -94,7 +95,17 @@ def main(dataset: DatasetType, fcm: FCMType, centroid_strategy: CentroidStrategy
             num_clusters=c,
             m=m,
             p=p,
-            beta=beta,
+            max_iter=steps,
+            noise=noise,
+            centroid_strategy=centroid_strategy
+        )
+    elif fcm == FCMType.NonoptimizedGFPCM:
+        beta = 1
+        fcm = NonoptimizedGFPCM(
+            num_clusters=c,
+            m=m,
+            p=p,
+            w_prob=beta,
             max_iter=steps,
             noise=noise,
             centroid_strategy=centroid_strategy
@@ -179,12 +190,13 @@ def main(dataset: DatasetType, fcm: FCMType, centroid_strategy: CentroidStrategy
     fcm.evaluate(true_labels)
 
 if __name__ == '__main__':
-    strategy=CentroidStrategy.Random
+    strategy = CentroidStrategy.Random
+    deterministic = True
     #main(DatasetType.NormalizedBreastCancer, FCMType.FCM, strategy)
     #main(DatasetType.Iris, FCMType.PFCM, strategy)
     #main(DatasetType.NormalizedBreastCancer, FCMType.NonoptimizedFPCM, strategy)
     #main(DatasetType.NormalizedBreastCancer, FCMType.NonoptimizedFPCM, strategy)
-    main(DatasetType.Glass, FCMType.FCPlus1M, strategy)
+    main(deterministic, DatasetType.Glass, FCMType.NonoptimizedFPCM, strategy)
     # main(DatasetType.Iris, FCMType.PFCM, strategy)
     # main(DatasetType.Iris, FCMType.STPFCM, strategy)
     # main(DatasetType.Iris, FCMType.NonoptimizedFP3CM, strategy)

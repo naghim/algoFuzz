@@ -28,7 +28,7 @@ if __name__ == '__main__':
         # # Proposed FCM
         # #'eta': [1e-9, 1e-7, 1e-5, 1e-3, 1e-1, 1]
 
-        'type': [FCMType.NonoptimizedFPCM],
+        'type': [FCMType.NonoptimizedGFPCM],
         'dataset': [DatasetType.NormalizedIris],
         'num_clusters': [3],
         'max_iter': [100],
