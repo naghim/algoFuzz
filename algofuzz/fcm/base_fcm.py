@@ -14,8 +14,8 @@ from algofuzz.validation.confusion_matrix import find_best_permutation
 from algofuzz.validation.validity_index import adjusted_rand_index, normalized_mutual_information, purity
 from algofuzz.enums import CentroidStrategy
 from algofuzz.exceptions import NotTrainedException, AlgofuzzException
-from typing import Optional, Literal
-from pydantic import BaseModel, Extra, Field
+from typing import Optional
+from pydantic import BaseModel, Field, ConfigDict
 from numpy.typing import NDArray
 from sklearn.metrics import confusion_matrix
 from numpy.typing import ArrayLike
@@ -23,24 +23,23 @@ import matplotlib.pyplot as plt
 import numpy as np
 import random
 
+
 class BaseFCM(BaseModel):
     """
     Base class of all FCM implementations.
     """
 
-    num_clusters: int = Field(default=5, ge=1)
+    num_clusters: int = Field(default=5, json_schema_extra={"minimum": 1})
     """
     The number of clusters to form. The default value is 5. Must be greater than 0.
     """
 
-
-    max_iter: int = Field(default=150, ge=1)
+    max_iter: int = Field(default=150, json_schema_extra={"minimum": 1})
     """
     The maximum number of iterations to perform. The default value is 150. Must be greater than 0.
     """
 
-
-    m: float = Field(default=2.0, ge=1.0)
+    m: float = Field(default=2.0, json_schema_extra={"minimum": 1.0})
     """ 
     The fuzzifier parameter. A value of 1.0 corresponds to hard clustering, while a value greater than 1.0 corresponds to soft clustering. The default value is 2.0. Must be greater than 1.0.
     """
@@ -50,7 +49,8 @@ class BaseFCM(BaseModel):
     The initial centroids of the clusters. If not provided, the centroids will be initialized using the specified strategy.
     """
 
-    centroid_strategy: Optional[CentroidStrategy] = Field(default=CentroidStrategy.Random)
+    centroid_strategy: Optional[CentroidStrategy] = Field(
+        default=CentroidStrategy.Random)
     """
     The strategy to use for initializing the centroids of the clusters. If not provided, the centroids will be initialized randomly.
     """
@@ -59,10 +59,7 @@ class BaseFCM(BaseModel):
     """
     A flag indicating whether the model has been trained. The default value is False.
     """
-
-    class Config:
-        extra = Extra.forbid
-        arbitrary_types_allowed = True
+    model_config = ConfigDict(extra='forbid', arbitrary_types_allowed=True)
 
     def fit(self, X: NDArray) -> None:
         """
@@ -91,7 +88,8 @@ class BaseFCM(BaseModel):
         if not self.is_trained():
             raise NotTrainedException()
 
-        conf_matrix = confusion_matrix(true_labels, self.labels[:len(true_labels)])
+        conf_matrix = confusion_matrix(
+            true_labels, self.labels[:len(true_labels)])
         best_permuted_confusion = find_best_permutation(conf_matrix)
 
         pur = purity(best_permuted_confusion)
@@ -132,7 +130,8 @@ class BaseFCM(BaseModel):
         for i in range(self.num_clusters):
             cluster_points = X[:, labels == i]
 
-            plt.scatter(cluster_points[0], cluster_points[1], c=self._random_color(rand_gen), label=f'Cluster {i+1}')
+            plt.scatter(cluster_points[0], cluster_points[1], c=self._random_color(
+                rand_gen), label=f'Cluster {i+1}')
 
         plt.xlabel('Feature 1')
         plt.ylabel('Feature 2')
@@ -159,7 +158,8 @@ class BaseFCM(BaseModel):
             return
 
         if self.centroid_strategy == CentroidStrategy.Outliers:
-            self.centroids = (np.random.rand(x_size, self.num_clusters) * 10) + 10
+            self.centroids = (np.random.rand(
+                x_size, self.num_clusters) * 10) + 10
             return
 
         if self.centroid_strategy == CentroidStrategy.Diagonal:
@@ -168,27 +168,31 @@ class BaseFCM(BaseModel):
                     (np.min(X, axis=1) + np.max(X, axis=1)) / 2,
                     np.max(X, axis=1),
                     np.min(X, axis=1)
-                    )
+                )
             )
             return
 
         if self.centroid_strategy == CentroidStrategy.NormalizedIrisDiagonal:
             # TODO: revise this to be generalized, not dataset specific
-            self.centroids = np.array([[(1-(-1)**d)/2, 0.5, (1+(-1)**d)/2] for d in range(x_size)])
+            self.centroids = np.array(
+                [[(1-(-1)**d)/2, 0.5, (1+(-1)**d)/2] for d in range(x_size)])
             return
 
         if self.centroid_strategy == CentroidStrategy.NormalizedBreastDiagonal:
             # TODO: revise this to be generalized, not dataset specific
-            self.centroids = np.array([[(1-(-1)**d)/2, (1+(-1)**d)/2] for d in range(x_size)])
+            self.centroids = np.array(
+                [[(1-(-1)**d)/2, (1+(-1)**d)/2] for d in range(x_size)])
             return
 
         if self.centroid_strategy == CentroidStrategy.Sample:
-            random_indices = np.random.choice(y_size, self.num_clusters, replace=False)
-            self.centroids = X[:,random_indices]
+            random_indices = np.random.choice(
+                y_size, self.num_clusters, replace=False)
+            self.centroids = X[:, random_indices]
             return
 
         if self.centroid_strategy == CentroidStrategy.Custom:
-            raise AlgofuzzException("Centroids must be set through the <centroids> field.")
+            raise AlgofuzzException(
+                "Centroids must be set through the <centroids> field.")
 
     @property
     def member(self) -> NDArray:

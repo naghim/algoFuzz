@@ -10,21 +10,24 @@ from algofuzz.exceptions import NotTrainedException
 import numpy as np
 
 
-class STPFCM(BaseFCM):
+class NonoptimizedSTPFCM(BaseFCM):
     """
     Partitions a numeric dataset using the Self-Tuning Possibilistic Fuzzy C-Means Clustering (ST-PFCM) algorithm.
     """
-    p: float = Field(default=2.0, gt=1.0)  # Exponent
+    p: float = Field(default=2.0, json_schema_extra={
+                     "exclusiveMinimum": 1.0})  # Exponent
     """
     The fuzzy exponent parameter. The default value is 2.0. Must be greater than 1.
     """
 
-    kappa: float = Field(default=1, ge=1e-9)  # Kappa
+    kappa: float = Field(default=1,
+                         json_schema_extra={"minimum": 1e-9})  # Kappa
     """
     The penalty factor for the noise cluster. The default value is 1. Must be greater than or equal to 1e-9.
     """
 
-    w_prob: float = Field(default=1.0, gt=0.0)  # a
+    w_prob: float = Field(default=1.0, json_schema_extra={
+                          "exclusiveMinimum": 0.0})  # a
     """ 
     Balancing factor, controls the influence of the probabilistic membership u in the clustering process. A higher weight increases the importance of u in updating the centroids.
 

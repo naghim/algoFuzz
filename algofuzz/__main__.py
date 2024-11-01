@@ -5,6 +5,7 @@ from algofuzz.datasets import load_dataset
 from sklearn.metrics import confusion_matrix
 import numpy as np
 
+
 def test_kappa(dataset: DatasetType):
     np.random.seed(0)
 
@@ -15,8 +16,8 @@ def test_kappa(dataset: DatasetType):
     v0 = np.random.rand(X.shape[0], c)  # Initial cluster centroids
     a = 1.0  # Weighting factor for the membership
     steps = 10  # Number of iterations
-    preprocess_iter = 15 # Number of iterations for Pal FCM preprocessing
-    b = 1.0 # Weighting factor for the distance
+    preprocess_iter = 15  # Number of iterations for Pal FCM preprocessing
+    b = 1.0  # Weighting factor for the distance
 
     PUR = []
     ARI = []
@@ -24,7 +25,7 @@ def test_kappa(dataset: DatasetType):
     kappa_values = list(range(1, 35, 1))
 
     for kappa in kappa_values:
-        fcm = STPFCM(
+        fcm = NonoptimizedSTPFCM(
             num_clusters=c,
             m=m,
             p=p,
@@ -35,7 +36,8 @@ def test_kappa(dataset: DatasetType):
             kappa=kappa
         )
         fcm.fit(X)
-        conf_matrix = confusion_matrix(true_labels, fcm.labels[:len(true_labels)])
+        conf_matrix = confusion_matrix(
+            true_labels, fcm.labels[:len(true_labels)])
         best_permuted_confusion = find_best_permutation(conf_matrix)
 
         PURR = purity(best_permuted_confusion)
@@ -65,28 +67,27 @@ def test_kappa(dataset: DatasetType):
     plt.axis('equal')
     plt.show()
 
+
 def main(deterministic: bool, dataset: DatasetType, fcm: FCMType, centroid_strategy: CentroidStrategy):
     if deterministic:
         np.random.seed(0)
 
     X, c, true_labels = load_dataset(dataset)
-    m = 2 # Fuzzifier parameter
+    m = 2  # Fuzzifier parameter
     p = 2  # Exponent parameter
     eta = 2.0  # Penalty term parameter
     a = 1.0  # Weighting factor for the membership
     steps = 150  # Number of iterations
-    preprocess_iter = 15 # Number of iterations for Pal FCM preprocessing
-    b = 1.0 # Weighting factor for the distance
+    preprocess_iter = 15  # Number of iterations for Pal FCM preprocessing
+    b = 1.0  # Weighting factor for the distance
     beta = 100
     noise = 40
 
-    if fcm == FCMType.STPFCM:
-        fcm = STPFCM(
+    if fcm == FCMType.NonoptimizedSTPFCM:
+        fcm = NonoptimizedSTPFCM(
             num_clusters=c,
             m=m,
             p=p,
-            eta=eta,
-            weight=a,
             max_iter=steps,
             centroid_strategy=centroid_strategy
         )
@@ -153,8 +154,8 @@ def main(deterministic: bool, dataset: DatasetType, fcm: FCMType, centroid_strat
 
     # Print the results
     # print()
-    #print("Membership matrix:")
-    #print(fcm.member)
+    # print("Membership matrix:")
+    # print(fcm.member)
 
     # if hasattr(fcm, 'alpha'):
     #     print()
@@ -165,13 +166,14 @@ def main(deterministic: bool, dataset: DatasetType, fcm: FCMType, centroid_strat
     # print("Final eta values:")
     # print(fcm.cluster_eta)
     # print()
-    #print("Labels:")
-    #print(fcm.labels)
-    #print()
+    # print("Labels:")
+    # print(fcm.labels)
+    # print()
 
-    #print('fcm shape', fcm.labels.shape)
+    # print('fcm shape', fcm.labels.shape)
+    print(fcm.labels.tolist())
     conf_matrix = confusion_matrix(true_labels, fcm.labels[:len(true_labels)])
-    best_permuted_confusion = find_best_permutation(conf_matrix)
+    best_permuted_confusion = conf_matrix  # find_best_permutation(conf_matrix)
     print(best_permuted_confusion)
     print(np.sum(np.diag(best_permuted_confusion)))
 
@@ -185,18 +187,19 @@ def main(deterministic: bool, dataset: DatasetType, fcm: FCMType, centroid_strat
     # print("Final eta values:")
     # print(fcm.cluster_eta)
     # print()
-    #fcm.plot_clusters(X)
+    # fcm.plot_clusters(X)
 
-    fcm.evaluate(true_labels)
+    print(fcm.evaluate(true_labels))
+
 
 if __name__ == '__main__':
     strategy = CentroidStrategy.Random
     deterministic = True
-    #main(DatasetType.NormalizedBreastCancer, FCMType.FCM, strategy)
-    #main(DatasetType.Iris, FCMType.PFCM, strategy)
-    #main(DatasetType.NormalizedBreastCancer, FCMType.NonoptimizedFPCM, strategy)
-    #main(DatasetType.NormalizedBreastCancer, FCMType.NonoptimizedFPCM, strategy)
-    main(deterministic, DatasetType.Glass, FCMType.NonoptimizedFPCM, strategy)
+    # main(DatasetType.NormalizedBreastCancer, FCMType.FCM, strategy)
+    # main(DatasetType.Iris, FCMType.PFCM, strategy)
+    # main(DatasetType.NormalizedBreastCancer, FCMType.NonoptimizedFPCM, strategy)
+    # main(DatasetType.NormalizedBreastCancer, FCMType.NonoptimizedFPCM, strategy)
+    main(deterministic, DatasetType.Iris, FCMType.NonoptimizedSTPFCM, strategy)
     # main(DatasetType.Iris, FCMType.PFCM, strategy)
     # main(DatasetType.Iris, FCMType.STPFCM, strategy)
     # main(DatasetType.Iris, FCMType.NonoptimizedFP3CM, strategy)

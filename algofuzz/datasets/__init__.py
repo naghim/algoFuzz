@@ -19,7 +19,8 @@ from algofuzz.enums import DatasetType
 
 __all__ = ['load_dataset']
 
-def load_dataset(dataset: DatasetType, num_clusters: int = 3, offset: int = 1):
+
+def load_dataset(dataset: DatasetType, num_clusters: int = 3, offset: int = 1, tranpose: bool = True):
     """
     Load a dataset based on the specified type.
 
@@ -27,7 +28,7 @@ def load_dataset(dataset: DatasetType, num_clusters: int = 3, offset: int = 1):
         dataset (DatasetType): The type of dataset to load.
         num_clusters (int): The number of clusters in the dataset. The default value is 3.
         offset (int): The spacing between bubbles in unit dimensions. The default value is 1.
-    
+
     Returns:
         data: np.ndarray
             The dataset.
@@ -42,7 +43,10 @@ def load_dataset(dataset: DatasetType, num_clusters: int = 3, offset: int = 1):
         data = iris.data
         true_labels = iris.target
         num_clusters = len(iris.target_names)
-        return data.T, num_clusters, true_labels
+        if tranpose == True:
+            return data.T, num_clusters, true_labels
+        else:
+            return data, num_clusters, true_labels
     if dataset == DatasetType.Glass:
         from algofuzz.datasets.glass import load_glass
         glass = load_glass()
