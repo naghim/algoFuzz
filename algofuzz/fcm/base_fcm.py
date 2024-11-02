@@ -59,6 +59,8 @@ class BaseFCM(BaseModel):
     """
     A flag indicating whether the model has been trained. The default value is False.
     """
+
+    transposed: bool = True
     model_config = ConfigDict(extra='forbid', arbitrary_types_allowed=True)
 
     def fit(self, X: NDArray) -> None:
@@ -146,15 +148,20 @@ class BaseFCM(BaseModel):
 
         return np.array([[rand_gen.uniform(0, 1), rand_gen.uniform(0, 1), rand_gen.uniform(0, 1)]])
 
-    def _create_centroids(self, X: NDArray) -> NDArray:
+    def _create_centroids(self, X: NDArray, transpose: bool = True) -> NDArray:
         if self.centroids is not None:
             return
-
-        x_size = X.shape[0]
-        y_size = X.shape[1]
+        if transpose == True:
+            x_size = X.shape[0]
+            y_size = X.shape[1]
+        else:
+            x_size = X.shape[1]
+            y_size = X.shape[0]
 
         if self.centroid_strategy == CentroidStrategy.Random:
             self.centroids = np.random.rand(x_size, self.num_clusters)
+            if transpose == False:
+                self.centroids = self.centroids.T
             return
 
         if self.centroid_strategy == CentroidStrategy.Outliers:
@@ -206,7 +213,10 @@ class BaseFCM(BaseModel):
         if not self.is_trained():
             raise NotTrainedException()
 
-        return np.argmax(self._member, axis=0)
+        if self.transposed == True:
+            return np.argmax(self._member, axis=0)
+        else:
+            return np.argmax(self._member, axis=1)
 
     @property
     def cluster_eta(self) -> NDArray:
