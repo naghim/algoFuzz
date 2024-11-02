@@ -73,7 +73,7 @@ def test_STPFCM(benchmark, dataset_notT, parameters):
                  max_iter=steps,
                  centroid_strategy=centroid_strategy, transposed=False)
 
-    benchmark(fcm.fit_new, data)
+    benchmark(fcm.fit, data)
     evaluate_result = np.asarray(fcm.evaluate(true_labels))
     print(evaluate_result)
     print(expected_evaluate_result)
