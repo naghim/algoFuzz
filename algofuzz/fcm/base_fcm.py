@@ -130,7 +130,7 @@ class BaseFCM(BaseModel):
         plt.figure(figsize=(8, 6))
 
         for i in range(self.num_clusters):
-            cluster_points = X[:, labels == i]
+            cluster_points = X[labels == i, :]
 
             plt.scatter(cluster_points[0], cluster_points[1], c=self._random_color(
                 rand_gen), label=f'Cluster {i+1}')

@@ -83,3 +83,27 @@ def test_STPFCM(benchmark, dataset_notT, parameters):
     assert np.array_equal(fcm.labels, expected_labels)
     np.testing.assert_allclose(
         evaluate_result, expected_evaluate_result)
+
+
+def test_predict_STPFCM(dataset_notT, parameters):
+    np.random.seed(0)
+
+    data, clus_num, true_labels = dataset_notT
+    m, p, steps, centroid_strategy = parameters
+
+    expected_labels = np.asarray([0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 1, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2,
+                                  2, 2, 2, 2, 1, 1, 2, 2, 2, 2, 2, 1, 2, 2, 1, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 2, 1, 2, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 2, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1, 1])
+
+    fcm = STPFCM(num_clusters=clus_num,
+                 m=m,
+                 p=p,
+                 max_iter=steps,
+                 centroid_strategy=centroid_strategy, transposed=False)
+
+    fcm.fit(data)
+    eta, members, labels = fcm.predict(data[:50])
+
+    # Assert allclose should be tested on membership matrix
+    assert np.array_equal(labels, expected_labels[:50])
+    # np.testing.assert_allclose(
+    # evaluate_result, expected_evaluate_result)
