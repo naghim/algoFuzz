@@ -2,3 +2,4 @@ pydantic
 scikit-learn
 matplotlib
 p_tqdm
+jax

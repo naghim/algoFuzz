@@ -1,4 +1,3 @@
-# test_clustering.py
 import pytest
 import numpy as np
 from algofuzz.fcm import NonoptimizedSTPFCM, STPFCM
@@ -103,7 +102,4 @@ def test_predict_STPFCM(dataset_notT, parameters):
     fcm.fit(data)
     eta, members, labels = fcm.predict(data[:50])
 
-    # Assert allclose should be tested on membership matrix
     assert np.array_equal(labels, expected_labels[:50])
-    # np.testing.assert_allclose(
-    # evaluate_result, expected_evaluate_result)
