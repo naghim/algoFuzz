@@ -1,8 +1,9 @@
 import pytest
 import numpy as np
-from algofuzz.metrics.euclidean import EuclideanDistance
 import os
-group = "EuclideanDistance"
+from algofuzz.metrics import ManhattanDistance
+
+group = "ManhattanDistance"
 
 
 @pytest.fixture
@@ -18,55 +19,61 @@ def vectors():
 def test_2d_distance():
     point1 = np.array([[0, 0]])
     point2 = np.array([[3, 4]])
-    e = EuclideanDistance()
-    print(e.compute(point1, point2))
+
+    m = ManhattanDistance()
+    print(m.compute(point1, point2))
     np.testing.assert_allclose(
-        e.compute(point1, point2), np.array([[5]]), atol=1e-9)
+        m.compute(point1, point2), np.array([[7]]), atol=1e-9
+    )
 
 
 def test_3d_distance():
     point1 = np.array([[1, 2, 3]])
     point2 = np.array([[4, 5, 6]])
 
-    e = EuclideanDistance()
+    m = ManhattanDistance()
     np.testing.assert_allclose(
-        e.compute(point1, point2), np.array([[np.sqrt(27)]]), atol=1e-9)
+        m.compute(point1, point2), np.array([[9]]), atol=1e-9
+    )
 
 
 def test_same_point():
     point1 = np.array([[1, 1, 1]])
     point2 = np.array([[1, 1, 1]])
 
-    e = EuclideanDistance()
+    m = ManhattanDistance()
     np.testing.assert_allclose(
-        e.compute(point1, point2), np.array([[0]]), atol=1e-9)
+        m.compute(point1, point2), np.array([[0]]), atol=1e-9
+    )
 
 
 def test_large_numbers():
     point1 = np.array([[1e6, 1e6]])
     point2 = np.array([[2e6, 2e6]])
 
-    e = EuclideanDistance()
+    m = ManhattanDistance()
     np.testing.assert_allclose(
-        e.compute(point1, point2), np.array([[1.414213562e6]]), atol=1e-9)
+        m.compute(point1, point2), np.array([[2e6]]), atol=1e-9
+    )
 
 
 def test_n_dimensional_distance():
     point1 = np.array([[1, 2, 3, 4, 5]])
     point2 = np.array([[5, 4, 3, 2, 1]])
 
-    e = EuclideanDistance()
+    m = ManhattanDistance()
     np.testing.assert_allclose(
-        e.compute(point1, point2), np.array([[np.sqrt(40)]]), atol=1e-9)
+        m.compute(point1, point2), np.array([[12]]), atol=1e-9
+    )
 
 
-def test_euclidean_distance_with_negative_values():
+def test_negative_values():
     point1 = np.array([[-1, -2, -3]])
     point2 = np.array([[1, 2, 3]])
-    e = EuclideanDistance()
+    m = ManhattanDistance()
 
     np.testing.assert_allclose(
-        e.compute(point1, point2), np.array([[7.483315]]), atol=1e-9
+        m.compute(point1, point2), np.array([[12]]), atol=1e-9
     )
 
 
@@ -78,7 +85,7 @@ def test_benchmark_distance_np(benchmark, vectors):
 
     def numpy_function(X, Y):
         return np.linalg.norm(
-            X[:, np.newaxis, :] - Y[np.newaxis, :, :], axis=-1)
+            X[:, np.newaxis, :] - Y[np.newaxis, :, :], ord=0, axis=-1)
     benchmark(numpy_function, vector_a, vector_b)
 
 
@@ -87,5 +94,5 @@ def test_benchmark_distance_np(benchmark, vectors):
 def test_benchmark_distance_current_implementation(benchmark, vectors):
 
     vector_a, vector_b = vectors
-    e = EuclideanDistance()
-    benchmark(e.compute, vector_a, vector_b)
+    m = ManhattanDistance()
+    benchmark(m.compute, vector_a, vector_b)
