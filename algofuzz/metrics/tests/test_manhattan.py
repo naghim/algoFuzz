@@ -6,6 +6,10 @@ from algofuzz.metrics import ManhattanDistance
 group = "ManhattanDistance"
 
 
+def numpy_function(X, Y):
+    return np.abs(X[:, None] - Y).sum(-1)
+
+
 @pytest.fixture
 def vectors():
     np.random.seed(0)
@@ -77,15 +81,24 @@ def test_negative_values():
     )
 
 
+def test_pairwise_distance():
+    points1 = np.array([[-1, -2, -3], [1, 1, 1], [3, 3, 3]])
+    points2 = np.array([[1, 2, 3], [-1, -1, -1], [4, 5, 6]])
+
+    m = ManhattanDistance()
+    pairwise_distances = m.compute(points1, points2)
+    expected_distances = numpy_function(points1, points2)
+
+    np.testing.assert_allclose(
+        pairwise_distances, expected_distances, atol=1e-9)
+
+
 @pytest.mark.benchmark(group=group)
 @pytest.mark.skipif(os.environ.get("BENCHMARK") != "1", reason="Skipping benchmarks")
 def test_benchmark_distance_np(benchmark, vectors):
 
     vector_a, vector_b = vectors
 
-    def numpy_function(X, Y):
-        return np.linalg.norm(
-            X[:, np.newaxis, :] - Y[np.newaxis, :, :], ord=0, axis=-1)
     benchmark(numpy_function, vector_a, vector_b)
 
 

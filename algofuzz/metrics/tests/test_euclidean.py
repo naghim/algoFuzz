@@ -5,6 +5,11 @@ import os
 group = "EuclideanDistance"
 
 
+def numpy_function(X, Y):
+    return np.linalg.norm(
+        X[:, np.newaxis, :] - Y[np.newaxis, :, :], axis=-1)
+
+
 @pytest.fixture
 def vectors():
     np.random.seed(0)
@@ -70,8 +75,20 @@ def test_euclidean_distance_with_negative_values():
     )
 
 
-@pytest.mark.benchmark(group=group)
-@pytest.mark.skipif(os.environ.get("BENCHMARK") != "1", reason="Skipping benchmarks")
+def test_pairwise_distance():
+    points1 = np.array([[-1, -2, -3], [1, 1, 1], [3, 3, 3]])
+    points2 = np.array([[1, 2, 3], [-1, -1, -1], [4, 5, 6]])
+
+    e = EuclideanDistance()
+    pairwise_distances = e.compute(points1, points2)
+    expected_distances = numpy_function(points1, points2)
+
+    np.testing.assert_allclose(
+        pairwise_distances, expected_distances, atol=1e-9)
+
+
+@ pytest.mark.benchmark(group=group)
+@ pytest.mark.skipif(os.environ.get("BENCHMARK") != "1", reason="Skipping benchmarks")
 def test_benchmark_distance_np(benchmark, vectors):
 
     vector_a, vector_b = vectors
@@ -82,8 +99,8 @@ def test_benchmark_distance_np(benchmark, vectors):
     benchmark(numpy_function, vector_a, vector_b)
 
 
-@pytest.mark.benchmark(group=group)
-@pytest.mark.skipif(os.environ.get("BENCHMARK") != "1", reason="Skipping benchmarks")
+@ pytest.mark.benchmark(group=group)
+@ pytest.mark.skipif(os.environ.get("BENCHMARK") != "1", reason="Skipping benchmarks")
 def test_benchmark_distance_current_implementation(benchmark, vectors):
 
     vector_a, vector_b = vectors

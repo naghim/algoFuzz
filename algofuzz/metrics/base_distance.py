@@ -1,4 +1,5 @@
 from abc import ABC, abstractmethod
+import numpy as np
 
 
 class BaseDistance(ABC):
@@ -8,7 +9,7 @@ class BaseDistance(ABC):
         self.metric_name = metric_name
 
     @abstractmethod
-    def compute(self, X, Y):
+    def compute(self, X: np.ndarray, Y: np.ndarray) -> np.ndarray:
         """
         Compute the pairwise distances between two sets of vectors X and Y.
 
