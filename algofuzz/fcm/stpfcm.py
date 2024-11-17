@@ -9,22 +9,23 @@ from algofuzz.fcm.base_fcm import BaseFCM
 from algofuzz.exceptions import NotTrainedException
 import numpy as np
 
+
 class STPFCM(BaseFCM):
     """
     Partitions a numeric dataset using the Self-Tuning Possibilistic Fuzzy C-Means Clustering (ST-PFCM) algorithm.
     """
-    p: float = Field(default=2.0, gt=1.0) # Exponent
+    p: float = Field(default=2.0, gt=1.0)  # Exponent
     """
     The fuzzy exponent parameter. The default value is 2.0. Must be greater than 1.
     """
 
-    kappa: float = Field(default=1, ge=1e-9) # Kappa
+    kappa: float = Field(default=1, ge=1e-9)  # Kappa
     """
     The penalty factor for the noise cluster. The default value is 1. Must be greater than or equal to 1e-9.
     """
 
-    w_prob: float = Field(default=1.0, gt=0.0) # a
-    """ 
+    w_prob: float = Field(default=1.0, gt=0.0)  # a
+    """
     Balancing factor, controls the influence of the probabilistic membership u in the clustering process. A higher weight increases the importance of u in updating the centroids.
 
     The default value is 1.0. Must be greater than 0.
@@ -33,15 +34,15 @@ class STPFCM(BaseFCM):
     def fit(self, X: NDArray) -> None:
         """
         Fits the model to the data.
-        
+
         Parameters:
-            X (NDArray): The input data.
+            X (NDArray): The input data of shape (n_samples, n_features)
         Returns:
             None
         """
 
-        z = X.shape[0]
-        n = X.shape[1]
+        n = X.shape[0]
+        z = X.shape[1]
 
         u = np.zeros((self.num_clusters, n))
         t = np.zeros((self.num_clusters, n))
@@ -49,63 +50,109 @@ class STPFCM(BaseFCM):
         corrected_p = 1 / (self.p - 1)
         corrected_m = -2 / (self.m - 1)
 
-        center = np.mean(X, axis=1)
-        eta_sum = 0
-        # print(center)
-        for i in range(n):
-            eta_sum += np.linalg.norm(X[:, i] - center) ** 2
+        center = np.mean(X, axis=0)
+
+        eta_sum = np.linalg.norm(X[:, :] - center) ** 2  # np.sum()
 
         eta = (self.kappa / n) * eta_sum
 
         eta2 = eta
         alpha = np.full(self.num_clusters, 1.0 / self.num_clusters)
 
-        self._create_centroids(X)
+        self._create_centroids(X, transpose=False)
 
         for _ in range(self.max_iter):
-            # Calculate t
-            norms = np.linalg.norm(X[:, np.newaxis, :] - self.centroids[:, :, np.newaxis], axis=0) ** 2
-            exponents = (norms / (eta2 * (alpha[:, np.newaxis] ** (self.m - 1)))) ** corrected_p
+            distances = np.linalg.norm(
+                X[:, np.newaxis, :] - self.centroids[np.newaxis, :, :], axis=2)
+            exponents = (
+                (distances ** 2) / (eta2 * (alpha[np.newaxis, :] ** (self.m - 1)))) ** corrected_p
             t = 1 / (1 + exponents)
+            exact_matches = np.isclose(distances, 0, atol=1e-7)
+            u = np.zeros((n, self.num_clusters))
 
-            # new u
-            for k in range(n):
-                exact = None
+            if np.any(exact_matches):
+                exact_indices = np.argmax(exact_matches, axis=1)
+                u[np.arange(n), exact_indices] = 1
+            non_exact_indices = np.where(~np.any(exact_matches, axis=1))[0]
 
-                for i in range(self.num_clusters):
-                    if np.linalg.norm(X[:, k] - self.centroids[:, i]) < 0.0000001:
-                        exact = i
-                        break
+            if non_exact_indices.size > 0:
+                norm_diff_non_exact = distances[non_exact_indices, :]
+                u[non_exact_indices, :] = alpha * \
+                    (norm_diff_non_exact ** corrected_m)
+                u[non_exact_indices, :] /= np.sum(
+                    u[non_exact_indices, :], axis=1, keepdims=True)
 
-                if exact is not None:
-                    u[:, k] = np.zeros(self.num_clusters)
-                    u[exact, k] = 1
-                    continue
-
-                norm_diff = np.linalg.norm(X[:, k, np.newaxis] - self.centroids, axis=0)
-                u[:, k] = alpha * norm_diff ** corrected_m
-                u[:, k] /= np.sum(u[:, k])
-
-            # new alpha
-            alpha = np.sum((self.w_prob * u ** self.m + t ** self.p) * np.transpose(np.linalg.norm(X[:, :, np.newaxis] - self.centroids[:, np.newaxis, :], axis=0) ** 2), axis=1) ** (1 / self.m)
+            alpha = np.sum((self.w_prob * u ** self.m + t ** self.p)
+                           * (distances ** 2), axis=0) ** (1 / self.m)
             alpha /= np.sum(alpha)
 
-            # new v
-            for i in range(self.num_clusters):
-                sumup = np.zeros(z)
-                sumdn = np.zeros(z)
+            sumcur = (self.w_prob * u **
+                      self.m + t ** self.p)
 
-                for k in range(n):
-                    sumcur = (self.w_prob * u[i, k] ** self.m + t[i, k] ** self.p)
-                    sumup += sumcur * X[:, k]
-                    sumdn += sumcur
+            weighted_sum = np.dot(sumcur.T, X)
 
-                self.centroids[:, i] = sumup / sumdn
+            sumdn = np.sum(sumcur, axis=0)
+
+            self.centroids = np.divide(weighted_sum, sumdn[:, np.newaxis], out=np.zeros_like(
+                weighted_sum), where=sumdn[:, np.newaxis] != 0)
 
         self._eta = eta2 * (alpha ** (self.m - 1))
         self._member = self.w_prob * u ** self.m + t ** self.p
         self._alpha = alpha
         self.trained = True
+
+    def predict(self, X):
+        if not self.is_trained():
+            raise NotTrainedException()
+
+        n = X.shape[0]
+        z = X.shape[1]
+
+        u = np.zeros((self.num_clusters, n))
+        t = np.zeros((self.num_clusters, n))
+
+        corrected_p = 1 / (self.p - 1)
+        corrected_m = -2 / (self.m - 1)
+
+        center = np.mean(X, axis=0)
+
+        eta_sum = np.linalg.norm(X[:, :] - center) ** 2  # np.sum()
+
+        eta = (self.kappa / n) * eta_sum
+
+        eta2 = eta
+        alpha = np.full(self.num_clusters, 1.0 / self.num_clusters)
+
+        for _ in range(self.max_iter):
+            distances = np.linalg.norm(
+                X[:, np.newaxis, :] - self.centroids[np.newaxis, :, :], axis=2)
+            exponents = (
+                (distances ** 2) / (eta2 * (alpha[np.newaxis, :] ** (self.m - 1)))) ** corrected_p
+            t = 1 / (1 + exponents)
+            exact_matches = np.isclose(distances, 0, atol=1e-7)
+            u = np.zeros((n, self.num_clusters))
+
+            if np.any(exact_matches):
+                exact_indices = np.argmax(exact_matches, axis=1)
+                u[np.arange(n), exact_indices] = 1
+            non_exact_indices = np.where(~np.any(exact_matches, axis=1))[0]
+
+            if non_exact_indices.size > 0:
+                norm_diff_non_exact = distances[non_exact_indices, :]
+                u[non_exact_indices, :] = alpha * \
+                    (norm_diff_non_exact ** corrected_m)
+                u[non_exact_indices, :] /= np.sum(
+                    u[non_exact_indices, :], axis=1, keepdims=True)
+
+            alpha = np.sum((self.w_prob * u ** self.m + t ** self.p)
+                           * (distances ** 2), axis=0) ** (1 / self.m)
+            alpha /= np.sum(alpha)
+
+        eta = eta2 * (alpha ** (self.m - 1))
+        member = self.w_prob * u ** self.m + t ** self.p
+        labels = np.argmax(member, axis=1)
+
+        return eta, member, labels
 
     @property
     def alpha(self) -> NDArray:

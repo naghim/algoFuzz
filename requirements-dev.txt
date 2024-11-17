@@ -1,0 +1,9 @@
+pytest
+pytest-cov
+pytest-mock
+pytest-xdist
+pytest-benchmark
+flake8
+black
+mypy
+tox

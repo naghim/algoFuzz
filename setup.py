@@ -6,6 +6,9 @@ with open('README.md', 'r') as f:
 with open('requirements.txt') as f:
     required = f.read().splitlines()
 
+with open('requirements-dev.txt') as f:
+    extra_required = f.read().splitlines()
+
 setuptools.setup(
     name='algofuzz',
     version='0.1.1',
@@ -16,6 +19,10 @@ setuptools.setup(
     long_description_content_type='text/markdown',
     url='https://github.com/naghim/algofuzz',
     install_requires=required,
+    extras_require={
+        'dev': extra_required,
+        'docs': []  # please insert here the necessary packages for docs
+    },
     packages=setuptools.find_packages(),
     classifiers=[
         'Development Status :: 1 - Planning',
