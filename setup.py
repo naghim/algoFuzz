@@ -21,7 +21,8 @@ setuptools.setup(
     install_requires=required,
     extras_require={
         'dev': extra_required,
-        'docs': []  # please insert here the necessary packages for docs
+        'docs': [],  # please insert here the necessary packages for docs
+        'gpu': ["jax[cuda12]"]
     },
     packages=setuptools.find_packages(),
     classifiers=[
