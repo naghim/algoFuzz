@@ -1,5 +1,5 @@
 """
-This module contains the implementation of the Generalized Fuzzy-Possibilistic C-Means Clustering algorithm proposed by Pal, Pal and Bezdek in 1997.
+This module contains the implementation of the Generalized Fuzzy-Possibilistic C-Means Clustering algorithm proposed by Naghi et al. in 2023.
 """
 
 from algofuzz.fcm.base_fcm import BaseFCM
@@ -17,11 +17,11 @@ class NonoptimizedGFPCM(BaseFCM):
     The fuzzy exponent parameter. The default value is 2.0. Must be greater than 1.
     """
 
-    w_prob: float = Field(default=1.0, gte=0.0) 
+    w_prob: float = Field(default=1.0, gte=1.0) 
     """
     Serves as a balancing factor: w_prob is used to weigh the influence of the second membership term t (possibilistic) relative to u (probabilistic). A larger w_prob gives more weight to the influence of the probabilistic term, whereas a smaller w_prob gives more importance to the probabilistic term. 
     
-    The default value is 1.0. Must be greater than or equal to 0.
+    The default value is 1.0. Must be greater than or equal to 1.
     """
 
     noise: Optional[float] = Field(default=0.0, gte=0.0) 
@@ -52,57 +52,37 @@ class NonoptimizedGFPCM(BaseFCM):
 
         u = np.zeros((self.num_clusters, n))
         t = np.zeros((self.num_clusters, n))
-        deriv_m = -2/(self.m - 1)
-        deriv_p = -2/(self.p - 1)
+        deriv_m = -2 / (self.m - 1)
+        deriv_p = -2 / (self.p - 1)
 
         self._create_centroids(X)
 
         for _ in range(self.max_iter):
-            d = np.zeros((self.num_clusters, n))
-
             # new u
             for k in range(n):
+                szum = 0
                 for i in range(self.num_clusters):
-                    for dim in range(z):
-                        d[i, k] += (X[dim, k] - self.centroids[dim, i]) ** 2
-
-            for k in range(n):
-                if min(d[:, k]) < 0.0000001:
-                    u[:, k] = 0
-
-                    for i in range(self.num_clusters):
-                        if d[i, k] < 0.0000001:
-                            u[i, k] = 1
-                else:
-                    s = (d[:, k] ** deriv_m).sum()
-
-                    for i in range(self.num_clusters):
-                        u[i, k] = (d[i, k] ** deriv_m) / s
+                    u[i, k] = np.linalg.norm(X[:, k] - self.centroids[:, i]) ** deriv_m
+                    szum += u[i, k]
+                for i in range(self.num_clusters):
+                    u[i, k] /= szum
 
             # new t
             for i in range(self.num_clusters):
-                db = np.count_nonzero(d[i, :] < 0.0000001)
-                if db > 0:
-                    t[i, :] = 0
-                    for k in range(n):
-                        if d[i, k] < 0.0000001:
-                            t[i, k] = 1/db
-                else:
-                    s = (d[i, :] ** deriv_p).sum()
-
-                    for k in range(n):
-                        t[i, k] = (d[i, k] ** deriv_p) / s
+                szum = 0
+                for k in range(n):
+                    t[i, k] = np.linalg.norm(X[:, k] - self.centroids[:, i]) ** deriv_p
+                    szum += t[i, k]
+                for k in range(n):
+                    t[i, k] /= szum
 
             # new v
             for i in range(self.num_clusters):
                 sumup = np.zeros(z)
-                sumdn = np.zeros(z)
-
+                sumdn = 0
                 for k in range(n):
-                    sumcur = (u[i, k] ** self.m) + (self.w_prob * (t[i, k] ** self.p))
-                    sumup += sumcur * X[:, k]
-                    sumdn += sumcur
-
+                    sumup += (u[i, k] ** self.m + self.w_prob * (t[i, k] ** self.p)) * X[:, k]
+                    sumdn += u[i, k] ** self.m + self.w_prob * (t[i, k] ** self.p)
                 self.centroids[:, i] = sumup / sumdn
 
         self._eta = None
