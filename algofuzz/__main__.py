@@ -190,7 +190,7 @@ def main(deterministic: bool, dataset: DatasetType, fcm: FCMType, centroid_strat
     fcm.evaluate(true_labels)
 
 if __name__ == '__main__':
-    strategy = CentroidStrategy.Random
+    strategy = CentroidStrategy.Mirtill
     deterministic = True
     #main(DatasetType.NormalizedBreastCancer, FCMType.FCM, strategy)
     #main(DatasetType.Iris, FCMType.PFCM, strategy)

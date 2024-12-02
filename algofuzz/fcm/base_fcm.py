@@ -50,7 +50,7 @@ class BaseFCM(BaseModel):
     The initial centroids of the clusters. If not provided, the centroids will be initialized using the specified strategy.
     """
 
-    centroid_strategy: Optional[CentroidStrategy] = Field(default=CentroidStrategy.Random)
+    centroid_strategy: Optional[CentroidStrategy] = Field(default=CentroidStrategy.Mirtill)
     """
     The strategy to use for initializing the centroids of the clusters. If not provided, the centroids will be initialized randomly.
     """
@@ -170,6 +170,16 @@ class BaseFCM(BaseModel):
                     np.min(X, axis=1)
                     )
             )
+
+            return
+
+        if self.centroid_strategy == CentroidStrategy.Mirtill:
+            self.centroids = np.zeros((X.shape[0], self.num_clusters))
+
+            for d in range(self.num_clusters):
+                val = d / (self.num_clusters - 1)
+                self.centroids[:, d] = val
+
             return
 
         if self.centroid_strategy == CentroidStrategy.NormalizedIrisDiagonal:
