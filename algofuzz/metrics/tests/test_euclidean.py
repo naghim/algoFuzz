@@ -1,6 +1,6 @@
 import pytest
 import numpy as np
-from algofuzz.metrics.euclidean import EuclideanDistance
+from algofuzz.metrics.distance_pairwise import euclidean
 import os
 group = "EuclideanDistance"
 
@@ -23,55 +23,50 @@ def vectors():
 def test_2d_distance():
     point1 = np.array([[0, 0]])
     point2 = np.array([[3, 4]])
-    e = EuclideanDistance()
-    print(e.compute(point1, point2))
+
+    print(euclidean(point1, point2))
     np.testing.assert_allclose(
-        e.compute(point1, point2), np.array([[5]]), atol=1e-9)
+        euclidean(point1, point2), np.array([[5]]), atol=1e-9)
 
 
 def test_3d_distance():
     point1 = np.array([[1, 2, 3]])
     point2 = np.array([[4, 5, 6]])
 
-    e = EuclideanDistance()
     np.testing.assert_allclose(
-        e.compute(point1, point2), np.array([[np.sqrt(27)]]), atol=1e-9)
+        euclidean(point1, point2), np.array([[np.sqrt(27)]]), atol=1e-9)
 
 
 def test_same_point():
     point1 = np.array([[1, 1, 1]])
     point2 = np.array([[1, 1, 1]])
 
-    e = EuclideanDistance()
     np.testing.assert_allclose(
-        e.compute(point1, point2), np.array([[0]]), atol=1e-9)
+        euclidean(point1, point2), np.array([[0]]), atol=1e-9)
 
 
 def test_large_numbers():
     point1 = np.array([[1e6, 1e6]])
     point2 = np.array([[2e6, 2e6]])
 
-    e = EuclideanDistance()
     np.testing.assert_allclose(
-        e.compute(point1, point2), np.array([[1.414213562e6]]), atol=1e-9)
+        euclidean(point1, point2), np.array([[1.414213562e6]]), atol=1e-9)
 
 
 def test_n_dimensional_distance():
     point1 = np.array([[1, 2, 3, 4, 5]])
     point2 = np.array([[5, 4, 3, 2, 1]])
 
-    e = EuclideanDistance()
     np.testing.assert_allclose(
-        e.compute(point1, point2), np.array([[np.sqrt(40)]]), atol=1e-9)
+        euclidean(point1, point2), np.array([[np.sqrt(40)]]), atol=1e-9)
 
 
 def test_euclidean_distance_with_negative_values():
     point1 = np.array([[-1, -2, -3]])
     point2 = np.array([[1, 2, 3]])
-    e = EuclideanDistance()
 
     np.testing.assert_allclose(
-        e.compute(point1, point2), np.array([[7.483315]]), atol=1e-9
+        euclidean(point1, point2), np.array([[7.483315]]), atol=1e-9
     )
 
 
@@ -79,8 +74,7 @@ def test_pairwise_distance():
     points1 = np.array([[-1, -2, -3], [1, 1, 1], [3, 3, 3]])
     points2 = np.array([[1, 2, 3], [-1, -1, -1], [4, 5, 6]])
 
-    e = EuclideanDistance()
-    pairwise_distances = e.compute(points1, points2)
+    pairwise_distances = euclidean(points1, points2)
     expected_distances = numpy_function(points1, points2)
 
     np.testing.assert_allclose(
@@ -104,5 +98,5 @@ def test_benchmark_distance_np(benchmark, vectors):
 def test_benchmark_distance_current_implementation(benchmark, vectors):
 
     vector_a, vector_b = vectors
-    e = EuclideanDistance()
-    benchmark(e.compute, vector_a, vector_b)
+
+    benchmark(euclidean, vector_a, vector_b)

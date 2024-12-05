@@ -1,7 +1,3 @@
-__all__ = ['BaseDistance', 'EuclideanDistance',
-           'ManhattanDistance', 'CosineSimilarity']
+__all__ = ['distance_pairwise']
 
-from .base_distance import BaseDistance
-from .euclidean import EuclideanDistance
-from .manhattan import ManhattanDistance
-from .cosine_similarity import CosineSimilarity
+from .distance_pairwise import euclidean, manhattan, cosine_similarity
