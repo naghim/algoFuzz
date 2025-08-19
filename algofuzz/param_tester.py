@@ -223,7 +223,7 @@ class MultivariateParamTester(object):
         duration = time.time() - start_time
 
         # Evaluate performance
-        purity, nmi, ari = fcm.evaluate(true_labels)
+        purity, nmi, ari = fcm.evaluate_true_labels(true_labels)
         csv_item = [value.name if hasattr(value, 'name') else value for value in item]
 
         try:

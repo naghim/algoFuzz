@@ -11,7 +11,7 @@ Inheriting from this class provides default implementations of:
 """
 
 from algofuzz import centroid_strategy
-from algofuzz.evaluate import evaluate
+from algofuzz.evaluate import evaluate_true_labels
 from algofuzz.enums import CentroidStrategy
 from algofuzz.exceptions import NotTrainedException
 from typing import Optional
@@ -72,7 +72,7 @@ class BaseFCM(BaseModel):
         """
         raise NotImplementedError()
 
-    def evaluate(self, true_labels: NDArray) -> list[float]:
+    def evaluate_true_labels(self, true_labels: NDArray) -> list[float]:
         """
         Evaluate the clustering results. Currently uses the true labels of the dataset to perform the evaluations.
 
@@ -88,7 +88,7 @@ class BaseFCM(BaseModel):
         if not self.is_trained():
             raise NotTrainedException()
 
-        return evaluate(self.labels, true_labels)
+        return evaluate_true_labels(self.labels, true_labels)
 
     def is_trained(self) -> bool:
         """

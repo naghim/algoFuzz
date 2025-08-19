@@ -28,7 +28,7 @@ def evaluate_fcm(individual, num_clusters, max_iter, X, true_labels):
     model.set_centroids(centroid_strategy.create_centroids(X, CentroidStrategy.Diagonal, num_clusters))
     model.fit(X)
 
-    purity, nmi, ari = evaluate.evaluate(model.get_predicted_labels(), true_labels)
+    purity, nmi, ari = evaluate.evaluate_true_labels(model.get_predicted_labels(), true_labels)
     fitness_score = 0.4 * purity + 0.3 * nmi + 0.3 * ari
     return (purity, nmi, ari)
 
@@ -116,7 +116,7 @@ def print_confu(num_clusters, max_iter, X, true_labels, m, p, kappa, w_prob):
     model.fit(X)
 
     labels = model.get_predicted_labels()
-    purity, nmi, ari = evaluate.evaluate(labels, true_labels)
+    purity, nmi, ari = evaluate.evaluate_true_labels(labels, true_labels)
     print("Purity:", purity)
     print("NMI:", nmi)
     print("ARI:", ari)

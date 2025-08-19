@@ -6,7 +6,7 @@ from algofuzz.validation.validity_index import adjusted_rand_index, normalized_m
 
 import logging
 
-def evaluate(predicted_labels: NDArray, true_labels: NDArray) -> list[float]:
+def evaluate_true_labels(predicted_labels: NDArray, true_labels: NDArray) -> list[float]:
     """
     Evaluate the clustering results. Currently uses the true labels of the dataset to perform the evaluations.
 

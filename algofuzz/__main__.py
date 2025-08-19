@@ -187,7 +187,7 @@ def main(deterministic: bool, dataset: DatasetType, fcm: FCMType, centroid_strat
     # print()
     #fcm.plot_clusters(X)
 
-    fcm.evaluate(true_labels)
+    fcm.evaluate_true_labels(true_labels)
 
 if __name__ == '__main__':
     strategy = CentroidStrategy.Mirtill
