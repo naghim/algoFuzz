@@ -13,6 +13,7 @@ from algofuzz.validation import find_best_permutation
 from algofuzz.algorithm import eaSimple
 from algofuzz import centroid_strategy, evaluate
 import random
+import matplotlib.pyplot as plt
 
 def evaluate_fcm(individual, num_clusters, max_iter, X, true_labels):
     m, p, kappa, w_prob = individual[:4]
@@ -124,7 +125,7 @@ def genetic_optimize_fcm(X, num_clusters, max_iter, true_labels, ngen=20, pop_si
     toolbox.register("evaluate", evaluate_fcm, num_clusters=num_clusters, X=X, max_iter=max_iter, true_labels=true_labels)
     toolbox.register("mate", tools.cxBlend, alpha=0.5)
     toolbox.register("mutate", tools.mutGaussian, mu=0, sigma=0.2, indpb=0.2)
-    toolbox.register("select", tools.selTournament, tournsize=3)
+    toolbox.register("select", tools.selTournament, tournsize=5)
 
     BOUNDS_LOW = [M[0], P[0], KAPPA[0], W_PROB[0]]
     BOUNDS_UP = [M[-1], P[-1], KAPPA[1], W_PROB[1]]
@@ -143,12 +144,12 @@ def genetic_optimize_fcm(X, num_clusters, max_iter, true_labels, ngen=20, pop_si
     stats.register("avg", np.mean)
     stats.register("max", np.max)
 
-    eaSimple(
+    pop, logbook = eaSimple(
         pop, toolbox, cxpb=0.5, mutpb=0.2, ngen=ngen,
         stats=stats, halloffame=hof, verbose=True
     )
 
-    return hof[0]
+    return hof[0], logbook
 
 def print_confu(num_clusters, max_iter, X, true_labels, m, p, kappa, w_prob, actual_num_clusters=None):
     if actual_num_clusters is None:
@@ -467,10 +468,54 @@ def save_clustering_performance_table():
         fh.write("\n".join(md_lines))
 
     print(f"Wrote clustering performance table to {out_path}")
+def plot_fitness_over_generations(filename="fitness_over_generations.png"):
+    datasets = [
+        DatasetType.NormalizedBreastCancer,
+        DatasetType.NormalizedWine,
+        DatasetType.NormalizedSeeds,
+        DatasetType.NormalizedIris
+    ]
+    
+    all_logbooks = []
+    random_values = [0, 1, 2, 3, 4] # Using the same random seeds as calculate_optimized_hyperparameters
+
+    for dataset_type in datasets:
+        np.random.seed(21) # Use a fixed seed for reproducibility of the plot
+        random.seed(21) # Use a fixed seed for reproducibility of the plot
+
+        X, c, true_labels = load_dataset(dataset_type)
+        max_iter = 100
+        percentage = 1
+        small_X, small_true_labels = select_subset(X, true_labels, percentage)
+
+        # Run genetic optimization and get the logbook
+        _, logbook = genetic_optimize_fcm(small_X, c, max_iter, small_true_labels)
+        logbook.dataset_name = str(dataset_type).split('.')[-1] # Extract dataset name
+        all_logbooks.append(logbook)
+
+    plt.figure(figsize=(12, 8))
+    colors = ['blue', 'green', 'red', 'purple', 'orange']
+    
+    for i, logbook in enumerate(all_logbooks):
+        gen = logbook.select("gen")
+        hof_fitness = logbook.select("hof_fitness")
+        dataset_name = logbook.dataset_name
+        print(f'Gen: {gen}')
+        print(f'HOF Fitness: {hof_fitness}')
+        plt.plot(gen, hof_fitness, label=f'Dataset: {dataset_name}', color=colors[i % len(colors)])
+
+    plt.xlabel("Generation")
+    plt.ylabel("Best Fitness Score")
+    plt.title("Best Fitness Score Over Generations for Each Dataset")
+    plt.legend(loc="lower right")
+    plt.grid(True)
+    plt.savefig(filename, dpi=300)
+    plt.show()
     return rows
 
 if __name__ == "__main__":
     #calculate_optimized_hyperparameters()
-    save_clustering_performance_table()
+    #save_clustering_performance_table()
+    plot_fitness_over_generations()
     import sys
     sys.exit()

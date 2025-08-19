@@ -5,7 +5,7 @@ from deap.algorithms import varAnd
 def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
              halloffame=None, verbose=__debug__):
     logbook = tools.Logbook()
-    logbook.header = ['gen', 'nevals'] + (stats.fields if stats else [])
+    logbook.header = ['gen', 'nevals'] + (stats.fields if stats else []) + ['hof_fitness']
 
     # Evaluate the individuals with an invalid fitness
     invalid_ind = [ind for ind in population if not ind.fitness.valid]
@@ -17,7 +17,8 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
         halloffame.update(population)
 
     record = stats.compile(population) if stats else {}
-    logbook.record(gen=0, nevals=len(invalid_ind), **record)
+    hof_fit = halloffame[0].fitness.values[0] if halloffame and halloffame[0].fitness.valid else None
+    logbook.record(gen=0, nevals=len(invalid_ind), hof_fitness=hof_fit, **record)
     if verbose:
         print(logbook.stream)
     
@@ -46,13 +47,16 @@ def eaSimple(population, toolbox, cxpb, mutpb, ngen, stats=None,
 
         # Append the current generation statistics to the logbook
         record = stats.compile(population) if stats else {}
-        logbook.record(gen=gen, nevals=len(invalid_ind), **record)
+        hof_fit = halloffame[0].fitness.values[0] if halloffame and halloffame[0].fitness.valid else None
+        logbook.record(gen=gen, nevals=len(invalid_ind), hof_fitness=hof_fit, **record)
         if verbose:
             print(logbook.stream)
 
-        if halloffame[0] == prev_hof:
+        if hof_fit == prev_hof:
+            print(f'Hof fit: {hof_fit} is now same as {prev_hof}, stopping early')
             break
         
-        prev_hof = halloffame[0]
+        print(f'Prev hof: {prev_hof}, new hof fit {hof_fit}')
+        prev_hof = hof_fit
 
     return population, logbook
