@@ -11,7 +11,7 @@ Inheriting from this class provides default implementations of:
 """
 
 from algofuzz import centroid_strategy
-from algofuzz.evaluate import evaluate_true_labels
+from algofuzz.evaluate import evaluate_true_labels, evaluate_inner_metrics
 from algofuzz.enums import CentroidStrategy
 from algofuzz.exceptions import NotTrainedException
 from typing import Optional
@@ -89,6 +89,23 @@ class BaseFCM(BaseModel):
             raise NotTrainedException()
 
         return evaluate_true_labels(self.labels, true_labels)
+
+    def evaluate_inner_metrics(self, X: NDArray) -> tuple[float, float]:
+        """
+        Evaluate the clustering results using inner metrics.
+
+        Parameters:
+            X (NDArray): The input data.
+
+        Returns:
+            tuple[float, float]: A tuple containing the following evaluation metrics:
+                - Davies-Bouldin Index (normalized to 0-1 if necessary)
+                - Silhouette Score (normalized to 0-1 if necessary)
+        """
+        if not self.is_trained():
+            raise NotTrainedException()
+        
+        return evaluate_inner_metrics(X, self.labels)
 
     def is_trained(self) -> bool:
         """

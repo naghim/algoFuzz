@@ -157,5 +157,21 @@ def load_dataset(dataset: DatasetType, num_clusters: int = 3, offset: int = 1):
         return load_dataset(DatasetType.PrevBubbles, num_clusters=3, offset=1.1)
     elif dataset == DatasetType.Bubbles4:
         return load_dataset(DatasetType.PrevBubbles, num_clusters=3, offset=1.2)
+    elif dataset == DatasetType.Spellman:
+        from algofuzz.datasets.spellman import load_spellman
+        spellman = load_spellman()
+        data = spellman.data
+        num_clusters = None
+        true_labels = None
+        return data.T, num_clusters, true_labels
+    elif dataset == DatasetType.NormalizedSpellman:
+        from algofuzz.datasets.spellman import load_spellman
+        from sklearn.preprocessing import MinMaxScaler
+        spellman = load_spellman()
+        scaler = MinMaxScaler()
+        data = scaler.fit_transform(spellman.data)
+        true_labels = None
+        num_clusters = None
+        return data.T, num_clusters, true_labels
     else:
         raise ValueError('Invalid dataset type')
