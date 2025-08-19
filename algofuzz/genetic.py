@@ -3,6 +3,8 @@ import numpy as np
 from algofuzz.datasets import load_dataset
 from algofuzz.enums import CentroidStrategy
 from algofuzz.enums import DatasetType
+from algofuzz.fcm.fcm import FCM
+from algofuzz.fcm.possibilistic_fcm import PFCM
 from algofuzz.subset_selector import select_subset
 from deap import base, creator, tools
 from stpfcm_module import STPFCM
@@ -331,11 +333,15 @@ Optional: Include min/max/mean if you ran multiple GA runs to show stability.
     return rows
 
 
-# Example usage:
-import sys
-if __name__ == "__main__":
-    calculate_optimized_hyperparameters()
-    sys.exit()
+def save_clustering_performance_table():
+    """
+    Clustering Performance Table
+
+    Purpose: Compare ST-PFCM with GA-tuned hyperparameters against:
+
+    Default ST-PFCM parameters
+    Classical FCM
+    """
     datasets = [
         DatasetType.NormalizedBreastCancer,
         DatasetType.NormalizedSpellman,
@@ -343,30 +349,128 @@ if __name__ == "__main__":
         DatasetType.NormalizedSeeds,
         DatasetType.NormalizedIris
     ]
-    # Generate dummy data
-    X, c, true_labels = load_dataset(DatasetType.NormalizedIris)
+    
+    rows = []
 
-    import time
-    start_time = time.time()
+    for dataset_type in datasets:
+        np.random.seed(42)
+        random.seed(42)
 
-    max_iter = 100
-    percentage = 1
-    small_X, small_true_labels = select_subset(X, true_labels, percentage)
-    best_params = genetic_optimize_fcm(small_X, c, max_iter, small_true_labels)
+        print(f'========{dataset_type}========')
+        X, c, true_labels = load_dataset(dataset_type)
+        max_iter = 100
+        percentage = 1
+        small_X, small_true_labels = select_subset(X, true_labels, percentage)
 
-    print('Best params:', best_params)
-    #print("Best parameters found:", best_params)
+        # GA Optimized ST-PFCM
+        best_params = genetic_optimize_fcm(small_X, c, max_iter, small_true_labels)
+        ga_optimized_num_clusters = int(best_params[-1]) if len(best_params) == 5 else int(c)
+        
+        ga_stpfcm_model = STPFCM(
+            num_clusters=ga_optimized_num_clusters,
+            max_iter=max_iter,
+            m=best_params[0],
+            p=best_params[1],
+            kappa=best_params[2],
+            w_prob=best_params[3]
+        )
+        ga_stpfcm_model.set_centroids(centroid_strategy.create_centroids(X, CentroidStrategy.Random, ga_optimized_num_clusters))
+        ga_stpfcm_model.fit(X)
+        ga_stpfcm_predicted_labels = ga_stpfcm_model.get_predicted_labels()
 
-    #m = 1.02
-    #p = 2
-    #kappa=1
-    #w_prob=1
-    #individual = (m,p,kappa,w_prob)
-    #print(evaluate_fcm(individual, c, 100, X, true_labels))
+        # Default ST-PFCM
+        default_stpfcm_model = STPFCM(num_clusters=c if c is not None else ga_optimized_num_clusters, max_iter=max_iter)
+        default_stpfcm_model.set_centroids(centroid_strategy.create_centroids(X, CentroidStrategy.Random, c if c is not None else ga_optimized_num_clusters))
+        default_stpfcm_model.fit(X)
+        default_stpfcm_predicted_labels = default_stpfcm_model.get_predicted_labels()
 
-    #best_params = [np.float64(2.766645499290813), np.float64(1.457847197366641), 7.6191293435736664, 3.2108470836542113]
-    print_confu(c, 100, X, true_labels, *best_params)
+        # Classical FCM
+        classical_fcm_model = FCM(num_clusters=c if c is not None else ga_optimized_num_clusters, max_iter=max_iter)
+        classical_fcm_model.fit(X)
+        classical_fcm_predicted_labels = classical_fcm_model.labels
 
+        if true_labels is not None:
+            classical_fcm_predicted_labels = classical_fcm_predicted_labels[:len(true_labels)]
+        
+        # Possibilistic FCM
+        possibilistic_fcm_model = PFCM(num_clusters=c if c is not None else ga_optimized_num_clusters, max_iter=max_iter)
+        possibilistic_fcm_model.fit(X)
+        possibilistic_fcm_predicted_labels = possibilistic_fcm_model.labels
 
-    end_time = time.time()
-    print(f"Execution Time: {end_time - start_time} seconds")
+        if true_labels is not None:
+            possibilistic_fcm_predicted_labels = possibilistic_fcm_predicted_labels[:len(true_labels)]
+
+        # Evaluate metrics
+        def get_metrics(predicted_labels, true_labels, X):
+            pur, nmi, ari = ('-', '-', '-')
+            if true_labels is not None:
+                processed_predicted_labels = predicted_labels[:len(true_labels)]
+                pur, ari, nmi = evaluate.evaluate_true_labels(processed_predicted_labels, true_labels)
+            else:
+                processed_predicted_labels = predicted_labels 
+        
+            try:
+                davies, silhouette = evaluate.evaluate_inner_metrics(X, processed_predicted_labels[:X.shape[1]])
+            except ValueError as e:
+                if 'Number of labels is' in str(e):
+                    davies = 1000
+                    silhouette = 0
+                else:
+                    raise e
+            return pur, nmi, ari, davies, silhouette
+
+        ga_stpfcm_metrics = get_metrics(ga_stpfcm_predicted_labels, true_labels, X)
+        default_stpfcm_metrics = get_metrics(default_stpfcm_predicted_labels, true_labels, X)
+        classical_fcm_metrics = get_metrics(classical_fcm_predicted_labels, true_labels, X)
+        possibilistic_fcm_metrics = get_metrics(possibilistic_fcm_predicted_labels, true_labels, X)
+
+        def fmt(x):
+            return x if x == '-' else f"{x:.2f}"
+
+        rows.append({
+            "dataset": str(dataset_type),
+            "ga_pur": fmt(ga_stpfcm_metrics[0]),
+            "ga_nmi": fmt(ga_stpfcm_metrics[1]),
+            "ga_ari": fmt(ga_stpfcm_metrics[2]),
+            "ga_davies": fmt(ga_stpfcm_metrics[3]),
+            "ga_silhouette": fmt(ga_stpfcm_metrics[4]),
+            "default_pur": fmt(default_stpfcm_metrics[0]),
+            "default_nmi": fmt(default_stpfcm_metrics[1]),
+            "default_ari": fmt(default_stpfcm_metrics[2]),
+            "default_davies": fmt(default_stpfcm_metrics[3]),
+            "default_silhouette": fmt(default_stpfcm_metrics[4]),
+            "classical_pur": fmt(classical_fcm_metrics[0]),
+            "classical_nmi": fmt(classical_fcm_metrics[1]),
+            "classical_ari": fmt(classical_fcm_metrics[2]),
+            "classical_davies": fmt(classical_fcm_metrics[3]),
+            "classical_silhouette": fmt(classical_fcm_metrics[4]),
+            "possibilistic_pur": fmt(possibilistic_fcm_metrics[0]),
+            "possibilistic_nmi": fmt(possibilistic_fcm_metrics[1]),
+            "possibilistic_ari": fmt(possibilistic_fcm_metrics[2]),
+            "possibilistic_davies": fmt(possibilistic_fcm_metrics[3]),
+            "possibilistic_silhouette": fmt(possibilistic_fcm_metrics[4]),
+        })
+
+    # write markdown file
+    md_lines = []
+    md_lines.append("| Dataset | GA Optimized: PUR | NMI | ARI | Davies | Silhouette | Default parameters: PUR | NMI | ARI | Davies | Silhouette | Classical FCM: PUR | NMI | ARI | Davies | Silhouette | Possibilistic FCM: PUR | NMI | ARI | Davies | Silhouette |")
+    md_lines.append("|---|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|---:|")
+
+    for r in rows:
+        md_lines.append(
+            "| {dataset} | {ga_pur} | {ga_nmi} | {ga_ari} | {ga_davies} | {ga_silhouette} | {default_pur} | {default_nmi} | {default_ari} | {default_davies} | {default_silhouette} | {classical_pur} | {classical_nmi} | {classical_ari} | {classical_davies} | {classical_silhouette} | {possibilistic_pur} | {possibilistic_nmi} | {possibilistic_ari} | {possibilistic_davies} | {possibilistic_silhouette} |"
+            .format(**r)
+        )
+
+    out_path = "clustering_performance_table.md"
+    with open(out_path, "w", encoding="utf-8") as fh:
+        fh.write("\n".join(md_lines))
+
+    print(f"Wrote clustering performance table to {out_path}")
+    return rows
+
+if __name__ == "__main__":
+    #calculate_optimized_hyperparameters()
+    save_clustering_performance_table()
+    import sys
+    sys.exit()
