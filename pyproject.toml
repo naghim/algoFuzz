@@ -1,0 +1,28 @@
+[project]
+name = "algofuzz"
+version = "0.1.0"
+description = "A unique framework dedicated to the implementation and comparison of various fuzzy c-means clustering algorithms."
+authors = [
+    { name = "MB. Naghi", email = "mirtill@naghi.me" },
+]
+requires-python = ">=3.8"
+readme = "README.md"
+license = { text = "MIT" }
+keywords = ["fuzzing", "genetic-algorithms"]
+classifiers = [
+    "Programming Language :: Python :: 3",
+    "License :: OSI Approved :: MIT License",
+    "Operating System :: OS Independent",
+]
+dependencies = [
+    "pydantic>=2,<3",
+    "scikit-learn>=1,<2",
+    "matplotlib>=3,<4",
+    "p_tqdm>=1,<2",
+    "deap>=1,<2",
+    "joblib>=1.4.2",
+]
+
+[project.urls]
+"Homepage" = "https://github.com/naghim/algofuzz"
+"Bug Tracker" = "https://github.com/naghim/algofuzz/issues"
