@@ -10,15 +10,13 @@ Inheriting from this class provides default implementations of:
 - Getting information such as the membership matrix, cluster labes, and cluster eta values
 """
 
-from algofuzz.validation.confusion_matrix import find_best_permutation
-from algofuzz.validation.validity_index import adjusted_rand_index, normalized_mutual_information, purity
+from algofuzz import centroid_strategy
+from algofuzz.evaluate import evaluate
 from algofuzz.enums import CentroidStrategy
-from algofuzz.exceptions import NotTrainedException, AlgofuzzException
-from typing import Optional, Literal
+from algofuzz.exceptions import NotTrainedException
+from typing import Optional
 from pydantic import BaseModel, Extra, Field
-from numpy.typing import NDArray
-from sklearn.metrics import confusion_matrix
-from numpy.typing import ArrayLike
+from numpy.typing import ArrayLike, NDArray
 import matplotlib.pyplot as plt
 import numpy as np
 import random
@@ -27,35 +25,34 @@ class BaseFCM(BaseModel):
     """
     Base class of all FCM implementations.
     """
-
     num_clusters: int = Field(default=5, ge=1)
+
     """
     The number of clusters to form. The default value is 5. Must be greater than 0.
     """
-
-
     max_iter: int = Field(default=150, ge=1)
+
     """
     The maximum number of iterations to perform. The default value is 150. Must be greater than 0.
     """
-
-
     m: float = Field(default=2.0, ge=1.0)
+
     """ 
     The fuzzifier parameter. A value of 1.0 corresponds to hard clustering, while a value greater than 1.0 corresponds to soft clustering. The default value is 2.0. Must be greater than 1.0.
     """
-
     centroids: Optional[ArrayLike] = Field(default=None)
+
     """
     The initial centroids of the clusters. If not provided, the centroids will be initialized using the specified strategy.
     """
-
     centroid_strategy: Optional[CentroidStrategy] = Field(default=CentroidStrategy.Mirtill)
+
     """
     The strategy to use for initializing the centroids of the clusters. If not provided, the centroids will be initialized randomly.
     """
 
     trained: bool = False
+
     """
     A flag indicating whether the model has been trained. The default value is False.
     """
@@ -91,14 +88,7 @@ class BaseFCM(BaseModel):
         if not self.is_trained():
             raise NotTrainedException()
 
-        conf_matrix = confusion_matrix(true_labels, self.labels[:len(true_labels)])
-        best_permuted_confusion = find_best_permutation(conf_matrix)
-
-        pur = purity(best_permuted_confusion)
-        ari = adjusted_rand_index(best_permuted_confusion)
-        nmi = normalized_mutual_information(best_permuted_confusion)
-
-        return pur, ari, nmi
+        return evaluate(self.labels, true_labels)
 
     def is_trained(self) -> bool:
         """
@@ -151,54 +141,7 @@ class BaseFCM(BaseModel):
         if self.centroids is not None:
             return
 
-        x_size = X.shape[0]
-        y_size = X.shape[1]
-
-        if self.centroid_strategy == CentroidStrategy.Random:
-            self.centroids = np.random.rand(x_size, self.num_clusters)
-            return
-
-        if self.centroid_strategy == CentroidStrategy.Outliers:
-            self.centroids = (np.random.rand(x_size, self.num_clusters) * 10) + 10
-            return
-
-        if self.centroid_strategy == CentroidStrategy.Diagonal:
-            self.centroids = np.column_stack(
-                (
-                    (np.min(X, axis=1) + np.max(X, axis=1)) / 2,
-                    np.max(X, axis=1),
-                    np.min(X, axis=1)
-                    )
-            )
-
-            return
-
-        if self.centroid_strategy == CentroidStrategy.Mirtill:
-            self.centroids = np.zeros((X.shape[0], self.num_clusters))
-
-            for d in range(self.num_clusters):
-                val = d / (self.num_clusters - 1)
-                self.centroids[:, d] = val
-
-            return
-
-        if self.centroid_strategy == CentroidStrategy.NormalizedIrisDiagonal:
-            # TODO: revise this to be generalized, not dataset specific
-            self.centroids = np.array([[(1-(-1)**d)/2, 0.5, (1+(-1)**d)/2] for d in range(x_size)])
-            return
-
-        if self.centroid_strategy == CentroidStrategy.NormalizedBreastDiagonal:
-            # TODO: revise this to be generalized, not dataset specific
-            self.centroids = np.array([[(1-(-1)**d)/2, (1+(-1)**d)/2] for d in range(x_size)])
-            return
-
-        if self.centroid_strategy == CentroidStrategy.Sample:
-            random_indices = np.random.choice(y_size, self.num_clusters, replace=False)
-            self.centroids = X[:,random_indices]
-            return
-
-        if self.centroid_strategy == CentroidStrategy.Custom:
-            raise AlgofuzzException("Centroids must be set through the <centroids> field.")
+        self.centroids = centroid_strategy.create_centroids(X, self.centroid_strategy, self.num_clusters)
 
     @property
     def member(self) -> NDArray:
