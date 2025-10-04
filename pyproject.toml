@@ -5,7 +5,7 @@ description = "A unique framework dedicated to the implementation and comparison
 authors = [
     { name = "MB. Naghi", email = "mirtill@naghi.me" },
 ]
-requires-python = ">=3.8"
+requires-python = ">=3.10"
 readme = "README.md"
 license = { text = "MIT" }
 keywords = ["fuzzing", "genetic-algorithms"]

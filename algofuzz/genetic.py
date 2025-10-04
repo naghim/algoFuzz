@@ -7,7 +7,7 @@ from algofuzz.fcm.fcm import FCM
 from algofuzz.fcm.possibilistic_fcm import PFCM
 from algofuzz.subset_selector import select_subset
 from deap import base, creator, tools
-from stpfcm_module import STPFCM
+from algofuzz._algofuzz import STPFCM
 from sklearn.metrics import confusion_matrix
 from algofuzz.validation import find_best_permutation
 from algofuzz.algorithm import eaSimple

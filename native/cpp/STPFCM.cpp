@@ -4,15 +4,24 @@
 #include <vector>
 #include <numeric> // For std::accumulate
 #include "STPFCM.h"
+#include "BaseFCM.h" // Include BaseFCM header
 #include "CentroidStrategy.h"
 #include "Metrics.h" // Assuming Metrics.h is needed for computeConfusionMatrix
 #include "DatasetLoader.h"
 #include <random>
 
+/**
+ * @brief Fits the model to the data.
+ *
+ * @param X The input data.
+ * @return None
+ */
 void STPFCM::fit(Eigen::MatrixXd &X) {
     if (!centroids_set) {
         throw std::runtime_error("Centroids must be set before calling fit. Use setCentroids() first.");
     }
+
+    std::cout << "Starting STPFCM fit with parameters:" << std::endl;
 
     int z = X.rows(); // Number of features
     int n = X.cols(); // Number of data points
@@ -120,9 +129,4 @@ void STPFCM::fit(Eigen::MatrixXd &X) {
         }
         predictedLabels.push_back(bestCluster);
     }
-}
-
-void STPFCM::setCentroids(const Eigen::MatrixXd& initial_centroids) {
-    centroids = initial_centroids;
-    centroids_set = true;
 }

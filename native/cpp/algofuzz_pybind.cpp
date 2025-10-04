@@ -2,6 +2,7 @@
 #include <pybind11/eigen.h>
 #include <pybind11/stl.h> // For std::vector and std::unordered_map
 
+#include "BaseFCM.h"
 #include "STPFCM.h"
 #include "DatasetLoader.h"
 
@@ -12,7 +13,26 @@ extern DatasetLoader dataset_loader;
 PYBIND11_MODULE(_algofuzz, m) {
     m.doc() = "pybind11 plugin for Algofuzz C++ module"; // Optional module docstring
 
-    py::class_<STPFCM>(m, "STPFCM")
+    py::class_<BaseFCM>(m, "BaseFCM")
+        .def(py::init<int, int, float>(),
+             py::arg("num_clusters"),
+             py::arg("max_iter"),
+             py::arg("m") = 2.0f)
+        .def("set_parameters", &BaseFCM::setParameters,
+             "Set parameters for the BaseFCM model from a dictionary")
+        .def("set_centroids", &BaseFCM::setCentroids,
+             "Set initial centroids for the BaseFCM model",
+             py::arg("initial_centroids"))
+        .def("is_trained", &BaseFCM::isTrained,
+             "Check if the model has been trained")
+        .def("get_centroids", &BaseFCM::getCentroids,
+             "Get the cluster centroids")
+        .def("get_member", &BaseFCM::getMember,
+             "Get the membership matrix")
+        .def("get_predicted_labels", &BaseFCM::getPredictedLabels,
+             "Get the predicted labels");
+
+    py::class_<STPFCM, BaseFCM>(m, "STPFCM")
         .def(py::init<int, int, float, float, float, float>(),
              py::arg("num_clusters"),
              py::arg("max_iter"),
@@ -25,21 +45,10 @@ PYBIND11_MODULE(_algofuzz, m) {
         .def("fit", &STPFCM::fit,
              "Fit the STPFCM model to the data",
              py::arg("X"))
-        .def("set_centroids", &STPFCM::setCentroids,
-             "Set initial centroids for the STPFCM model",
-             py::arg("initial_centroids"))
-        .def("is_trained", &STPFCM::isTrained,
-             "Check if the model has been trained")
-        .def("get_centroids", &STPFCM::getCentroids,
-             "Get the cluster centroids")
-        .def("get_member", &STPFCM::getMember,
-             "Get the membership matrix")
         .def("get_alpha", &STPFCM::getAlpha,
              "Get the alpha vector")
         .def("get_eta", &STPFCM::getEta,
-             "Get the eta matrix")
-        .def("get_predicted_labels", &STPFCM::getPredictedLabels,
-             "Get the predicted labels");
+             "Get the eta matrix");
 
     py::class_<Dataset>(m, "Dataset")
         .def_readwrite("X", &Dataset::X)

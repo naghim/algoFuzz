@@ -20,6 +20,7 @@ set(CMAKE_CXX_FLAGS_RELEASE "-O3")
 
 # Add pybind11 module for STPFCM
 pybind11_add_module(_algofuzz
+    BaseFCM.cpp
     STPFCM.cpp
     CentroidStrategy.cpp
     DatasetLoader.cpp
