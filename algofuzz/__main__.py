@@ -164,10 +164,10 @@ def main(deterministic: bool, dataset: DatasetType, fcm: FCMType, centroid_strat
     # print(fcm.get_eta())
     # print()
     #print("Labels:")
-    #print(fcm.labels)
+    #print(fcm.get_predicted_labels())
     #print()
 
-    #print('fcm shape', fcm.labels.shape)
+    #print('fcm shape', fcm.get_predicted_labels().shape)
     predicted_labels = fcm.get_predicted_labels()
     conf_matrix = confusion_matrix(true_labels, predicted_labels[:len(true_labels)])
     best_permuted_confusion = find_best_permutation(conf_matrix)

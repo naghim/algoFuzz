@@ -40,7 +40,7 @@ Refer to the [documentation](https://algofuzz.naghi.me/en/latest/getting_started
 
 ```python
 from algofuzz import FCM
-from algofuzz import CentroidStrategy, DatasetType, load_dataset, generate_colors
+from algofuzz import CentroidStrategy, DatasetType, load_dataset, generate_colors, centroid_strategy
 import numpy as np
 import matplotlib.pyplot as plt
 import random
@@ -59,17 +59,19 @@ print(f'Number of clusters: {num_clusters}')
 fcm = FCM(
    num_clusters=num_clusters,
    max_iter=100,
-   centroid_strategy=CentroidStrategy.Random
 )
+
+# Initialize the initial centroids
+fcm.set_centroids(centroid_strategy.create_centroids(data, CentroidStrategy.Random, num_clusters))
 
 # Fit the model to the data
 fcm.fit(data)
 
 # These are the centroids of the clusters
-centers = fcm.centroids
+centers = fcm.get_centroids()
 
 # These are the labels assigned to each data point (there are 3 clusters)
-labels = fcm.labels
+labels = fcm.get_predicted_labels()
 ```
 
 # Algorithms

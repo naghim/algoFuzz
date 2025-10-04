@@ -388,16 +388,18 @@ def save_clustering_performance_table():
 
         # Classical FCM
         classical_fcm_model = FCM(num_clusters=c if c is not None else ga_optimized_num_clusters, max_iter=max_iter)
+        classical_fcm_model.set_centroids(centroid_strategy.create_centroids(X, CentroidStrategy.Random, c if c is not None else ga_optimized_num_clusters))
         classical_fcm_model.fit(X)
-        classical_fcm_predicted_labels = classical_fcm_model.labels
+        classical_fcm_predicted_labels = classical_fcm_model.get_predicted_labels()
 
         if true_labels is not None:
             classical_fcm_predicted_labels = classical_fcm_predicted_labels[:len(true_labels)]
         
         # Possibilistic FCM
         possibilistic_fcm_model = PFCM(num_clusters=c if c is not None else ga_optimized_num_clusters, max_iter=max_iter)
+        possibilistic_fcm_model.set_centroids(centroid_strategy.create_centroids(X, CentroidStrategy.Random, c if c is not None else ga_optimized_num_clusters))
         possibilistic_fcm_model.fit(X)
-        possibilistic_fcm_predicted_labels = possibilistic_fcm_model.labels
+        possibilistic_fcm_predicted_labels = possibilistic_fcm_model.get_predicted_labels()
 
         if true_labels is not None:
             possibilistic_fcm_predicted_labels = possibilistic_fcm_predicted_labels[:len(true_labels)]

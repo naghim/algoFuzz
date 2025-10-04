@@ -106,8 +106,7 @@ To finetune the algorithm, you can set the parameters such as the number of clus
    # Create an FCM model with 3 clusters, choosing random initial centroids
    fcm = FCM(
       num_clusters=num_clusters,
-      max_iter=100,
-      centroid_strategy=CentroidStrategy.Random
+      max_iter=100
    )
 
 Fitting the data
@@ -117,14 +116,17 @@ Next, we fit the model to the data using the ``fit`` method. This will compute t
 
 .. code-block:: python
 
+   # Initialize the initial centroids
+   fcm.set_centroids(centroid_strategy.create_centroids(data, CentroidStrategy.Random, num_clusters))
+
    # Fit the model to the data
    fcm.fit(data)
 
    # These are the centroids of the clusters
-   centers = fcm.centroids
+   centers = fcm.get_centroids()
 
    # These are the labels assigned to each data point (there are 3 clusters)
-   labels = fcm.labels
+   labels = fcm.get_predicted_labels()
 
 Visualizing the clusters
 ========================

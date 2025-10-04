@@ -211,6 +211,7 @@ class MultivariateParamTester(object):
         fcm_class = get_fcm_by_type(fcm_type)
         dataset_key = (dataset_name, random_seed)
         dataset = self.dataset_cache[dataset_key]
+        centroid_strategy = actual_kwargs.pop('centroid_strategy', CentroidStrategy.Random)
         fcm = fcm_class(**actual_kwargs)
 
         X, num_clusters, true_labels = dataset
@@ -221,7 +222,7 @@ class MultivariateParamTester(object):
 
         # Fit model
         start_time = time.time()
-        fcm.set_centroids(centroid_strategy.create_centroids(X, CentroidStrategy.Random, num_clusters))
+        fcm.set_centroids(centroid_strategy.create_centroids(X, centroid_strategy, num_clusters))
         fcm.fit(X)
         duration = time.time() - start_time
 
