@@ -6,6 +6,9 @@
 #include "FCM.h"
 #include "FCPlus1M.h"
 #include "EtaFCM.h"
+#include "FP3CM.h"
+#include "GFPCM.h"
+#include "PFCM.h"
 #include "STPFCM.h"
 #include "DatasetLoader.h"
 
@@ -94,6 +97,50 @@ PYBIND11_MODULE(_algofuzz, m) {
              py::arg("X"))
         .def("get_eta", &EtaFCM::getEta,
              "Get the eta vector");
+
+    py::class_<FP3CM, BaseFCM>(m, "FP3CM")
+        .def(py::init<int, int, float, float, float, float>(),
+             py::arg("num_clusters"),
+             py::arg("max_iter"),
+             py::arg("m") = 2.0f,
+             py::arg("p") = 2.0f,
+             py::arg("eta") = 0.1f,
+             py::arg("noise") = 0.0f)
+        .def("set_parameters", &FP3CM::setParameters,
+             "Set parameters for the FP3CM model from a dictionary")
+        .def("fit", &FP3CM::fit,
+             "Fit the FP3CM model to the data",
+             py::arg("X"));
+
+    py::class_<GFPCM, BaseFCM>(m, "GFPCM")
+        .def(py::init<int, int, float, float, float, float>(),
+             py::arg("num_clusters"),
+             py::arg("max_iter"),
+             py::arg("m") = 2.0f,
+             py::arg("p") = 2.0f,
+             py::arg("w_prob") = 1.0f,
+             py::arg("noise") = 0.0f)
+        .def("set_parameters", &GFPCM::setParameters,
+             "Set parameters for the GFPCM model from a dictionary")
+        .def("fit", &GFPCM::fit,
+             "Fit the GFPCM model to the data",
+             py::arg("X"));
+
+    py::class_<PFCM, BaseFCM>(m, "PFCM")
+        .def(py::init<int, int, float, int, float, float, float, float>(),
+             py::arg("num_clusters"),
+             py::arg("max_iter"),
+             py::arg("m") = 2.0f,
+             py::arg("preprocess_iter") = 15,
+             py::arg("p") = 2.0f,
+             py::arg("w_pos") = 1.0f,
+             py::arg("w_prob") = 1.0f,
+             py::arg("noise") = 0.0f)
+        .def("set_parameters", &PFCM::setParameters,
+             "Set parameters for the PFCM model from a dictionary")
+        .def("fit", &PFCM::fit,
+             "Fit the PFCM model to the data",
+             py::arg("X"));
 
     py::class_<Dataset>(m, "Dataset")
         .def_readwrite("X", &Dataset::X)

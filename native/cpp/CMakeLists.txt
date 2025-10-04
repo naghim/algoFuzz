@@ -24,6 +24,9 @@ pybind11_add_module(_algofuzz
     FCM.cpp
     FCPlus1M.cpp
     EtaFCM.cpp
+    FP3CM.cpp
+    GFPCM.cpp
+    PFCM.cpp
     STPFCM.cpp
     CentroidStrategy.cpp
     DatasetLoader.cpp
