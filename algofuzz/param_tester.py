@@ -1,4 +1,4 @@
-from algofuzz import centroid_strategy, evaluate
+from algofuzz import centroid_strategy as centroid_strategy_module, evaluate
 from algofuzz.datasets import load_dataset
 from algofuzz.enums import CentroidStrategy
 from algofuzz.exceptions import MultivariateParamTesterException
@@ -36,7 +36,6 @@ class MultivariateParamTester(object):
 
     def queue_options(self) -> None:
         parameter_names = list(self.param_grid.keys())
-        literal_fields = ['trained']
 
         type_index = parameter_names.index('type')
         dataset_index = parameter_names.index('dataset')
@@ -52,7 +51,7 @@ class MultivariateParamTester(object):
 
         print('Generating options')
 
-        self.headers = ['index'] + parameter_names + ['eta', 'time', 'purity', 'nmi', 'ari']
+        self.headers = ['index'] + parameter_names + ['time', 'purity', 'nmi', 'ari']
         process_queue = []
         i = 0
 
@@ -86,7 +85,7 @@ class MultivariateParamTester(object):
                 self.dataset_cache[dataset_key] = dataset
 
             # Extract fields from FCM class
-            fields = fcm_class.__fields__.keys() - literal_fields
+            fields = fcm_class.get_parameter_names()
 
             # Update cluster number of item
             X, num_clusters, true_labels = dataset
@@ -111,7 +110,6 @@ class MultivariateParamTester(object):
 
             # Don't repeat test if parameters are irrelevant
             if already_done_key in self.already_done:
-                print('already done?')
                 continue
 
             self.already_done.add(already_done_key)
@@ -222,7 +220,7 @@ class MultivariateParamTester(object):
 
         # Fit model
         start_time = time.time()
-        fcm.set_centroids(centroid_strategy.create_centroids(X, centroid_strategy, num_clusters))
+        fcm.set_centroids(centroid_strategy_module.create_centroids(X, centroid_strategy, num_clusters))
         fcm.fit(X)
         duration = time.time() - start_time
 
@@ -231,12 +229,12 @@ class MultivariateParamTester(object):
         purity, nmi, ari = evaluate.evaluate_true_labels(predicted_labels, true_labels)
         csv_item = [value.name if hasattr(value, 'name') else value for value in item]
 
-        try:
-            eta = list(fcm.get_eta())
-        except:
-            eta = None
+        #try:
+        #    eta = list(fcm.get_eta())
+        #except:
+        #    eta = None
 
-        return [i] + csv_item + [eta, duration, purity, nmi, ari]
+        return [i] + csv_item + [duration, purity, nmi, ari]
 
     """
     Worker function that evaluates items from the input queue and puts the
@@ -254,13 +252,14 @@ if __name__ == '__main__':
     from algofuzz.enums import DatasetType, FCMType
 
     mvpt = MultivariateParamTester({
-        'type': [FCMType.FCM, FCMType.PFCM, FCMType.STPFCM],
-        'dataset': [DatasetType.Iris, DatasetType.NormalizedIris, DatasetType.NoisyNormalizedIris, DatasetType.NormalizedWine, DatasetType.BreastCancer, DatasetType.NormalizedBreastCancer, DatasetType.Bubbles1, DatasetType.Bubbles2, DatasetType.Bubbles3, DatasetType.Bubbles4],
+        'type': [FCMType.PFCM, FCMType.STPFCM, FCMType.FP3CM],
+        'dataset': [DatasetType.NormalizedNoisyNIris1, DatasetType.NormalizedNoisyNIris5, DatasetType.NormalizedNoisyNIris10, DatasetType.NormalizedNoisyNIris20, DatasetType.NormalizedNoisyNIris50, DatasetType.NormalizedNoisyNIris100],
         'num_clusters': [3],
         'm': [1.2, 1.5, 2.0, 3.0],
         'p': [1.2, 1.5, 2.0, 3.0],
         'weight': [1, 2],
-        'seed': [0]
+        'seed': [0],
+        'fcplus1m': [True, False]
     })
 
     mvpt.fit_to_csv('offset.csv')

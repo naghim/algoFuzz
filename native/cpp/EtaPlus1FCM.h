@@ -1,18 +1,18 @@
-#ifndef ETAFCM_H
-#define ETAFCM_H
+#ifndef ETAPLUS1FCM_H
+#define ETAPLUS1FCM_H
 
-#include "FCM.h"
+#include "FCPlus1M.h"
 #include <Eigen/Dense>
 #include <vector>
 #include <unordered_map>
 
 /**
- * @brief An extension of the FCM model that includes a penalty term (eta) for each cluster.
+ * @brief An extension of the FCM model that includes a penalty term (eta) plus one for each cluster.
  */
-class EtaFCM : public FCM
+class EtaPlus1FCM : public FCPlus1M
 {
 public:
-    EtaFCM(int num_clusters, int max_iter = 150, float m = 2.0f, float kappa = 1.0f, float noise = 0.0f);
+    EtaPlus1FCM(int num_clusters, int max_iter = 150, float m = 2.0f, float kappa = 1.0f, float noise = 0.0f);
 
     void setParameters(const std::unordered_map<std::string, double> &params) override;
 
@@ -24,4 +24,4 @@ protected:
     Eigen::VectorXd eta_values; ///< The penalty factor (eta) for each cluster.
 };
 
-#endif // ETAFCM_H
+#endif // ETAPLUS1FCM_H

@@ -1,26 +1,26 @@
-#include "EtaFCM.h"
+#include "EtaPlus1FCM.h"
 #include <iostream>
 #include <limits> // For numeric_limits
 #include <random> // For random_device, mt19937, uniform_int_distribution
 
-EtaFCM::EtaFCM(int num_clusters, int max_iter, float m, float kappa, float noise)
-    : FCM(num_clusters, max_iter, m, kappa, noise)
+EtaPlus1FCM::EtaPlus1FCM(int num_clusters, int max_iter, float m, float kappa, float noise)
+    : FCPlus1M(num_clusters, max_iter, m, kappa, noise)
 {
     eta_values.resize(num_clusters);
     eta_values.setZero();
 }
 
-void EtaFCM::setParameters(const std::unordered_map<std::string, double> &params)
+void EtaPlus1FCM::setParameters(const std::unordered_map<std::string, double> &params)
 {
-    FCM::setParameters(params); // Call base class method
-    // No additional parameters specific to EtaFCM in the Python class,
+    FCPlus1M::setParameters(params); // Call base class method
+    // No additional parameters specific to EtaPlus1FCM in the Python class,
     // but if there were, they would be handled here.
 }
 
-void EtaFCM::fit(const Eigen::MatrixXd &X_in)
+void EtaPlus1FCM::fit(const Eigen::MatrixXd &X_in)
 {
     // Call the base FCM's fit method to perform the clustering
-    FCM::fit(X_in);
+    FCPlus1M::fit(X_in);
 
     // After FCM.fit, member and centroids are populated.
     // Now calculate eta for each cluster.

@@ -10,13 +10,15 @@
 /**
  * @brief Partitions a numeric dataset using the Generalized Fuzzy-Possibilistic C-Means Clustering (GFPCM) algorithm.
  */
-class GFPCM : public BaseFCM {
+class GFPCM : public BaseFCM
+{
 public:
-    GFPCM(int num_clusters, int max_iter, float m, float p = 2.0f, float w_prob = 1.0f, float noise = 0.0f);
+    GFPCM(int num_clusters, int max_iter = 150, float m = 2.0f, float p = 2.0f, float w_prob = 1.0f, float noise = 0.0f);
 
-    void setParameters(const std::unordered_map<std::string, double>& params) override;
+    void setParameters(const std::unordered_map<std::string, double> &params) override;
+    static std::vector<std::string> getParameterNames();
 
-    void fit(const Eigen::MatrixXd& X);
+    void fit(const Eigen::MatrixXd &X);
 
 protected:
     float p;      ///< The fuzzy exponent parameter. The default value is 2.0. Must be greater than 1.

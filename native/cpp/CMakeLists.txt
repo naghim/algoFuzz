@@ -24,6 +24,7 @@ pybind11_add_module(_algofuzz
     FCM.cpp
     FCPlus1M.cpp
     EtaFCM.cpp
+    EtaPlus1FCM.cpp
     FP3CM.cpp
     GFPCM.cpp
     PFCM.cpp

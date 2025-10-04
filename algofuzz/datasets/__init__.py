@@ -19,6 +19,32 @@ from algofuzz.enums import DatasetType
 
 __all__ = ['load_dataset']
 
+noise_cache = {}
+
+# Function to generate random Iris dataset with noise
+def calc_rand(n):
+    if n in noise_cache:
+        return noise_cache[n]
+
+    from sklearn.datasets import load_iris
+    from sklearn.preprocessing import MinMaxScaler
+    iris = load_iris()
+    scaler = MinMaxScaler()
+    data = scaler.fit_transform(iris.data)
+    true_labels = iris.target
+    num_clusters = len(iris.target_names)
+
+    rng = np.random.default_rng(seed=42 * n)
+
+    for _ in range(n):
+        random_vector = rng.random(data.shape[1])
+        data = np.vstack((data, random_vector))
+
+    #true_labels = np.append(true_labels, max(iris.target))
+    rand_data = data.T, num_clusters, true_labels
+    noise_cache[n] = rand_data
+    return rand_data
+
 def load_dataset(dataset: DatasetType, num_clusters: int = 3, offset: int = 1):
     """
     Load a dataset based on the specified type.
@@ -66,6 +92,18 @@ def load_dataset(dataset: DatasetType, num_clusters: int = 3, offset: int = 1):
         true_labels = iris.target
         num_clusters = len(iris.target_names)
         return data.T, num_clusters, true_labels
+    elif dataset == DatasetType.NormalizedNoisyNIris1:
+        return calc_rand(1)
+    elif dataset == DatasetType.NormalizedNoisyNIris5:
+        return calc_rand(5)
+    elif dataset == DatasetType.NormalizedNoisyNIris10:
+        return calc_rand(10)
+    elif dataset == DatasetType.NormalizedNoisyNIris20:
+        return calc_rand(20)
+    elif dataset == DatasetType.NormalizedNoisyNIris50:
+        return calc_rand(50)
+    elif dataset == DatasetType.NormalizedNoisyNIris100:
+        return calc_rand(100)
     if dataset == DatasetType.NormalizedGlass:
         from algofuzz.datasets.glass import load_glass
         from sklearn.preprocessing import MinMaxScaler

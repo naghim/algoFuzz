@@ -10,13 +10,15 @@
 /**
  * @brief Partitions a numeric dataset using the Fuzzy Possibilistic Product Partition C-Means (FP3CM).
  */
-class FP3CM : public BaseFCM {
+class FP3CM : public BaseFCM
+{
 public:
-    FP3CM(int num_clusters, int max_iter, float m, float p = 2.0f, float eta = 0.1f, float noise = 0.0f);
+    FP3CM(int num_clusters, int max_iter = 150, float m = 2.0f, float p = 2.0f, float eta = 0.1f, float noise = 0.0f);
 
-    void setParameters(const std::unordered_map<std::string, double>& params) override;
+    void setParameters(const std::unordered_map<std::string, double> &params) override;
+    static std::vector<std::string> getParameterNames();
 
-    void fit(const Eigen::MatrixXd& X);
+    void fit(const Eigen::MatrixXd &X);
 
 protected:
     float p;   ///< The fuzzy exponent parameter. The default value is 2.0. Must be greater than 1.

@@ -11,11 +11,13 @@
  * @brief Partitions a numeric dataset using the F(C+1)M algorithm.
  *        This is an extension of the Fuzzy C-Means algorithm with an extra noise cluster.
  */
-class FCPlus1M : public FCM {
+class FCPlus1M : public FCM
+{
 public:
-    FCPlus1M(int num_clusters, int max_iter, float m, float kappa = 1.0f, float eta = 2.5f, float noise = 0.0f);
+    FCPlus1M(int num_clusters, int max_iter = 150, float m = 2.0f, float kappa = 1.0f, float eta = 2.5f, float noise = 0.0f);
 
-    void setParameters(const std::unordered_map<std::string, double>& params) override;
+    void setParameters(const std::unordered_map<std::string, double> &params) override;
+    static std::vector<std::string> getParameterNames();
 
 protected:
     float eta; ///< The penalty factor for the noise cluster. The default value is 2.5.
