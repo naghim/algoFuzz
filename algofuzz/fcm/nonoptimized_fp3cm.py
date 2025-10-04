@@ -4,8 +4,7 @@ This module contains the implementation of the Fuzzy Possibilistic Product Parti
 
 from numpy.typing import NDArray
 from pydantic import Field
-from algofuzz.fcm.base_fcm import BaseFCM
-from algofuzz.exceptions import NotTrainedException
+from algofuzz.fcm.python.base_fcm import BaseFCM
 import numpy as np
 
 class NonoptimizedFP3CM(BaseFCM):

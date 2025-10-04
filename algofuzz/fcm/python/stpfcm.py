@@ -5,7 +5,7 @@ This module contains the implementation of the ST-PFCM algorithm, which is a sel
 
 from numpy.typing import NDArray
 from pydantic import Field
-from algofuzz.fcm.base_fcm import BaseFCM
+from algofuzz.fcm.python.base_fcm import BaseFCM
 from algofuzz.exceptions import NotTrainedException
 import numpy as np
 

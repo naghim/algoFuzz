@@ -2,7 +2,7 @@
 This module contains the implementation of the Generalized Fuzzy-Possibilistic C-Means Clustering algorithm proposed by Naghi et al. in 2023.
 """
 
-from algofuzz.fcm.base_fcm import BaseFCM
+from algofuzz.fcm.python.base_fcm import BaseFCM
 from numpy.typing import NDArray
 from pydantic import Field
 import numpy as np

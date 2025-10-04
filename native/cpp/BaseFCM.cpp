@@ -1,5 +1,4 @@
 #include "BaseFCM.h"
 
-// No implementation needed for pure virtual functions or simple setters/getters
-// The constructor and setParameters are inlined in the header.
-// The pure virtual fit function must be implemented by derived classes.
+// No implementation needed for functions inlined in the header, such as the constructor, setParameters, and getXWithNoise.
+// Derived classes will implement their specific fit logic using getXWithNoise.

@@ -4,7 +4,7 @@ This module contains the implementation of the Possibilistic Fuzzy C-Means Clust
 
 from numpy.typing import NDArray
 from pydantic import Field
-from algofuzz.fcm.base_fcm import BaseFCM
+from algofuzz.fcm.python.base_fcm import BaseFCM
 from algofuzz.fcm.eta_fcm import EtaFCM
 import numpy as np
 

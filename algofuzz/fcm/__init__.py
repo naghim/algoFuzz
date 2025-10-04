@@ -1,6 +1,6 @@
 __all__ = ['EtaFCM', 'FCM', 'FCPlus1M', 'NonoptimizedFPCM', 'NonoptimizedGFPCM', 'NonoptimizedFP3CM', 'PFCM', 'STPFCM']
 
-from .base_fcm import BaseFCM
+from .python.base_fcm import BaseFCM
 from .eta_fcm import EtaFCM
 from .fcm import FCM
 from .fcplus1m import FCPlus1M
@@ -8,7 +8,7 @@ from .nonoptimized_fp3cm import NonoptimizedFP3CM
 from .nonoptimized_gfpcm import NonoptimizedGFPCM
 from .nonoptimized_fpcm import NonoptimizedFPCM
 from .possibilistic_fcm import PFCM
-from .stpfcm import STPFCM
+from .python.stpfcm import STPFCM
 from algofuzz.enums import FCMType
 
 def get_fcm_by_type(fcm_type: FCMType | str) -> BaseFCM:

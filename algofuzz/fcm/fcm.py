@@ -2,7 +2,7 @@
 This module contains the implementation of the Fuzzy C-Means algorithm, proposed by Dunn in 1973 and improved by Bezdek in 1981.
 """
 
-from algofuzz.fcm.base_fcm import BaseFCM
+from algofuzz.fcm.python.base_fcm import BaseFCM
 from numpy.typing import NDArray
 from pydantic import Field
 from typing import Optional
@@ -88,7 +88,6 @@ class FCM(BaseFCM):
         self._eta = None
         self._member = u
         self.trained = True
-        print(self.centroids)
 
     def calculate_initial_sum(self):
         return 0

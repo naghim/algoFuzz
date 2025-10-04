@@ -16,14 +16,16 @@
  * @param X The input data.
  * @return None
  */
-void STPFCM::fit(Eigen::MatrixXd &X) {
+void STPFCM::fit(Eigen::MatrixXd &X_in) {
     if (!centroids_set) {
         throw std::runtime_error("Centroids must be set before calling fit. Use setCentroids() first.");
     }
 
+    Eigen::MatrixXd X = getXWithNoise(X_in);
+
     std::cout << "Starting STPFCM fit with parameters:" << std::endl;
 
-    int z = X.rows(); // Number of features
+    int z = X.rows(); // Number of features (including noise if added)
     int n = X.cols(); // Number of data points
 
     num_points = n;

@@ -24,7 +24,7 @@ public:
         if (params.find("w_prob") != params.end()) w_prob = static_cast<float>(params.at("w_prob"));
     }
 
-    void fit(Eigen::MatrixXd &X) override;
+    void fit(Eigen::MatrixXd &X_in);
     // setCentroids is inherited from BaseFCM
     // isTrained is inherited from BaseFCM
     // getCentroids is inherited from BaseFCM
