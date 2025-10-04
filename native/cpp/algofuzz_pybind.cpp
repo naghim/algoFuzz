@@ -9,8 +9,8 @@ namespace py = pybind11;
 
 extern DatasetLoader dataset_loader;
 
-PYBIND11_MODULE(stpfcm_module, m) {
-    m.doc() = "pybind11 plugin for STPFCM C++ module"; // Optional module docstring
+PYBIND11_MODULE(_algofuzz, m) {
+    m.doc() = "pybind11 plugin for Algofuzz C++ module"; // Optional module docstring
 
     py::class_<STPFCM>(m, "STPFCM")
         .def(py::init<int, int, float, float, float, float>(),

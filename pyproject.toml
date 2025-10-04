@@ -15,14 +15,22 @@ classifiers = [
     "Operating System :: OS Independent",
 ]
 dependencies = [
-    "pydantic>=2,<3",
-    "scikit-learn>=1,<2",
-    "matplotlib>=3,<4",
-    "p_tqdm>=1,<2",
-    "deap>=1,<2",
-    "joblib>=1.4.2",
+    "pydantic>=2.11.10",
+    "scikit-learn>=1.7.2",
+    "matplotlib>=3.10.6",
+    "p_tqdm>=1.4.2",
+    "deap>=1.4.3",
+    "joblib>=1.5.2",
 ]
 
 [project.urls]
 "Homepage" = "https://github.com/naghim/algofuzz"
 "Bug Tracker" = "https://github.com/naghim/algofuzz/issues"
+
+[build-system]
+requires = ["scikit-build-core", "cmake>=3.18", "ninja>=1.10", "pybind11>=3.0.1"]
+build-backend = "scikit_build_core.build"
+
+[tool.scikit-build]
+cmake.build-type = "Release"
+cmake.source-dir = "native/cpp"
