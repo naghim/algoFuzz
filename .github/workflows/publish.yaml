@@ -14,8 +14,8 @@ jobs:
           python-version: "3.x"
       - name: Install dependencies
         run: |
-          apt-get update
-          apt-get install -y eigen3-dev
+          sudo apt-get update
+          sudo apt-get install -y eigen3-dev
       - name: Install pypa/build
         run: |
           python3 -m pip install build --user
