@@ -76,10 +76,6 @@ instance/
 # Sphinx documentation
 docs/_build/
 
-# PyBuilder
-.pybuilder/
-target/
-
 # Jupyter Notebook
 .ipynb_checkpoints
 
@@ -177,3 +173,12 @@ cython_debug/
 
 # Matlab files
 *.mat
+
+# C++
+*.cmake
+CMakeFiles
+CMakeCache.txt
+Makefile
+target
+membership_matrix_u.bin
+GFPCM_res_cpp.csv
