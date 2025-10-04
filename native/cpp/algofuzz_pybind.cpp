@@ -3,6 +3,8 @@
 #include <pybind11/stl.h> // For std::vector and std::unordered_map
 
 #include "BaseFCM.h"
+#include "FCM.h"
+#include "FCPlus1M.h"
 #include "STPFCM.h"
 #include "DatasetLoader.h"
 
@@ -32,6 +34,19 @@ PYBIND11_MODULE(_algofuzz, m) {
         .def("get_predicted_labels", &BaseFCM::getPredictedLabels,
              "Get the predicted labels");
 
+    py::class_<FCM, BaseFCM>(m, "FCM")
+        .def(py::init<int, int, float, float, float>(),
+             py::arg("num_clusters"),
+             py::arg("max_iter"),
+             py::arg("m") = 2.0f,
+             py::arg("kappa") = 1.0f,
+             py::arg("noise") = 0.0f)
+        .def("set_parameters", &FCM::setParameters,
+             "Set parameters for the FCM model from a dictionary")
+        .def("fit", &FCM::fit,
+             "Fit the FCM model to the data",
+             py::arg("X"));
+
     py::class_<STPFCM, BaseFCM>(m, "STPFCM")
         .def(py::init<int, int, float, float, float, float>(),
              py::arg("num_clusters"),
@@ -49,6 +64,20 @@ PYBIND11_MODULE(_algofuzz, m) {
              "Get the alpha vector")
         .def("get_eta", &STPFCM::getEta,
              "Get the eta matrix");
+
+    py::class_<FCPlus1M, FCM>(m, "FCPlus1M")
+        .def(py::init<int, int, float, float, float, float>(),
+             py::arg("num_clusters"),
+             py::arg("max_iter"),
+             py::arg("m") = 2.0f,
+             py::arg("kappa") = 1.0f,
+             py::arg("eta") = 2.5f,
+             py::arg("noise") = 0.0f)
+        .def("set_parameters", &FCPlus1M::setParameters,
+             "Set parameters for the FCPlus1M model from a dictionary")
+        .def("fit", &FCPlus1M::fit,
+             "Fit the FCPlus1M model to the data",
+             py::arg("X"));
 
     py::class_<Dataset>(m, "Dataset")
         .def_readwrite("X", &Dataset::X)
