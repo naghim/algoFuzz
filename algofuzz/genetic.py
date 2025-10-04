@@ -14,6 +14,7 @@ from algofuzz.algorithm import eaSimple
 from algofuzz import centroid_strategy, evaluate
 import random
 import matplotlib.pyplot as plt
+import time
 
 def evaluate_fcm(individual, num_clusters, max_iter, X, true_labels):
     m, p, kappa, w_prob = individual[:4]
@@ -322,7 +323,7 @@ Optional: Include min/max/mean if you ran multiple GA runs to show stability.
 
     for r in rows:
         md_lines.append(
-            "| {dataset} | {m:.4f} | {p:.4f} | {kappa:.4f} | {a:.4f} | {num_clusters} | {min_fitness:.6f} | {max_fitness:.6f} | {mean_fitness:.6f} | {stddev:.6f} |"
+            "| {dataset} | {m:.4f} | {p:.4f} | {kappa:.4f} | {a:.4f} | {num_clusters} | {min_fitness:.2f} | {max_fitness:.2f} | {mean_fitness:.2f} | {stddev:.4f} |"
             .format(**r)
         )
 
@@ -513,9 +514,239 @@ def plot_fitness_over_generations(filename="fitness_over_generations.png"):
     plt.show()
     return rows
 
+def create_computational_efficiency_table():
+    """
+    Computational Efficiency Table
+
+    Purpose: Calculate the best params for different percentages of the dataset,
+    and provide runtime improvements and performance decrease compared to 100%.
+
+    Columns: Dataset | Percentage | Max Fitness | Mean/Stddev Fitness | Runtime Improvement (%) | Performance Decrease (%)
+    """
+    datasets = [
+        DatasetType.NormalizedBreastCancer,
+        DatasetType.NormalizedSpellman,
+        DatasetType.NormalizedWine,
+        DatasetType.NormalizedSeeds,
+        DatasetType.NormalizedIris
+    ]
+    percentages = [1.0, 0.75, 0.50, 0.25, 0.10]
+    random_values = [0, 1, 2, 3, 4]
+    max_iter = 100
+    
+    rows = []
+
+    for dataset_type in datasets:
+        X_full, c_full, true_labels_full = load_dataset(dataset_type)
+        
+        # Run for 100% to get baseline
+        full_dataset_runtimes = []
+        full_dataset_fitnesses = []
+        for rand_val in random_values:
+            np.random.seed(rand_val)
+            random.seed(rand_val)
+            
+            start_time = time.time()
+            best_params, _ = genetic_optimize_fcm(X_full, c_full, max_iter, true_labels_full)
+            end_time = time.time()
+            
+            runtime = end_time - start_time
+            full_dataset_runtimes.append(runtime)
+            
+            chosen_c = int(best_params[-1]) if len(best_params) == 5 else int(c_full)
+            fitness_score = get_fitness_score(chosen_c, max_iter, X_full, true_labels_full, *best_params)
+            full_dataset_fitnesses.append(fitness_score)
+        
+        baseline_mean_runtime = np.mean(full_dataset_runtimes)
+        baseline_mean_fitness = np.mean(full_dataset_fitnesses)
+        baseline_max_fitness = np.max(full_dataset_fitnesses)
+        baseline_stddev_fitness = np.std(full_dataset_fitnesses)
+
+        # Add 100% baseline to rows
+        rows.append({
+            "dataset": str(dataset_type).split('.')[-1],
+            "percentage": 100,
+            "mean_max_fitness": baseline_mean_fitness,
+            "max_fitness": baseline_max_fitness,
+            "stddev_fitness": baseline_stddev_fitness,
+            "runtime_improvement": 0.0, # No improvement for 100%
+            "performance_decrease": 0.0 # No decrease for 100%
+        })
+        
+        for percentage in percentages[1:]: # Start from 75%
+            run_runtimes = []
+            run_fitnesses = []
+            
+            for rand_val in random_values:
+                np.random.seed(rand_val)
+                random.seed(rand_val)
+                
+                small_X, small_true_labels = select_subset(X_full, true_labels_full, percentage)
+                
+                start_time = time.time()
+                best_params, _ = genetic_optimize_fcm(small_X, c_full, max_iter, small_true_labels)
+                end_time = time.time()
+                
+                runtime = end_time - start_time
+                run_runtimes.append(runtime)
+                
+                chosen_c = int(best_params[-1]) if len(best_params) == 5 else int(c_full)
+                fitness_score = get_fitness_score(chosen_c, max_iter, X_full, true_labels_full, *best_params)
+                run_fitnesses.append(fitness_score)
+            
+            mean_max_fitness = np.mean(run_fitnesses)
+            max_fitness = np.max(run_fitnesses)
+            stddev_fitness = np.std(run_fitnesses)
+            mean_runtime = np.mean(run_runtimes)
+            
+            runtime_improvement_percent = ((baseline_mean_runtime - mean_runtime) / baseline_mean_runtime) * 100 if baseline_mean_runtime > 0 else 0
+            performance_decrease_percent = ((baseline_mean_fitness - mean_max_fitness) / baseline_mean_fitness) * 100 if baseline_mean_fitness > 0 else 0
+
+            rows.append({
+                "dataset": str(dataset_type).split('.')[-1],
+                "percentage": int(percentage * 100),
+                "mean_max_fitness": mean_max_fitness,
+                "max_fitness": max_fitness,
+                "stddev_fitness": stddev_fitness,
+                "runtime_improvement": runtime_improvement_percent,
+                "performance_decrease": performance_decrease_percent
+            })
+
+    # Write markdown file
+    md_lines = []
+    md_lines.append("| Dataset | Percentage | Max Fitness | Mean/Stddev Fitness | Runtime Improvement (%) | Performance Decrease (%) |")
+    md_lines.append("|---|---:|---:|---:|---:|---:|")
+
+    for r in rows:
+        md_lines.append(
+            "| {dataset} | {percentage}% | {max_fitness:.3f} | {mean_max_fitness:.3f} (± {stddev_fitness:.3f}) | {runtime_improvement:.2f} | {performance_decrease:.2f} |"
+            .format(**r)
+        )
+
+    out_path = "computational_efficiency_table.md"
+    with open(out_path, "w", encoding="utf-8") as fh:
+        fh.write("\n".join(md_lines))
+
+    print(f"Wrote computational efficiency table to {out_path}")
+    return rows
+
+def create_maxiter_efficiency_table():
+    """
+    Maxiter Efficiency Table
+
+    Purpose: Calculate the best params for different percentages of the dataset,
+    and provide runtime improvements and performance decrease compared to 100%.
+
+    Columns: Dataset | Percentage | Max Fitness | Mean/Stddev Fitness | Runtime Improvement (%) | Performance Decrease (%)
+    """
+    datasets = [
+        DatasetType.NormalizedBreastCancer,
+        DatasetType.NormalizedSpellman,
+        DatasetType.NormalizedWine,
+        DatasetType.NormalizedSeeds,
+        DatasetType.NormalizedIris
+    ]
+    percentages = [1.0, 0.75, 0.50, 0.25, 0.10]
+    random_values = [0, 1, 2, 3, 4]
+    
+    rows = []
+    max_iter = 100
+
+    for dataset_type in datasets:
+        X_full, c_full, true_labels_full = load_dataset(dataset_type)
+        
+        # Run for 100% to get baseline
+        full_dataset_runtimes = []
+        full_dataset_fitnesses = []
+        for rand_val in random_values:
+            np.random.seed(rand_val)
+            random.seed(rand_val)
+            
+            start_time = time.time()
+            best_params, _ = genetic_optimize_fcm(X_full, c_full, max_iter, true_labels_full)
+            end_time = time.time()
+            
+            runtime = end_time - start_time
+            full_dataset_runtimes.append(runtime)
+            
+            chosen_c = int(best_params[-1]) if len(best_params) == 5 else int(c_full)
+            fitness_score = get_fitness_score(chosen_c, max_iter, X_full, true_labels_full, *best_params)
+            full_dataset_fitnesses.append(fitness_score)
+        
+        baseline_mean_runtime = np.mean(full_dataset_runtimes)
+        baseline_mean_fitness = np.mean(full_dataset_fitnesses)
+        baseline_max_fitness = np.max(full_dataset_fitnesses)
+        baseline_stddev_fitness = np.std(full_dataset_fitnesses)
+
+        # Add 100% baseline to rows
+        rows.append({
+            "dataset": str(dataset_type).split('.')[-1],
+            "percentage": 100,
+            "mean_max_fitness": baseline_mean_fitness,
+            "max_fitness": baseline_max_fitness,
+            "stddev_fitness": baseline_stddev_fitness,
+            "runtime_improvement": 0.0, # No improvement for 100%
+            "performance_decrease": 0.0 # No decrease for 100%
+        })
+        
+        for percentage in percentages[1:]: # Start from 75%
+            run_runtimes = []
+            run_fitnesses = []
+            
+            for rand_val in random_values:
+                np.random.seed(rand_val)
+                random.seed(rand_val)
+                
+                start_time = time.time()
+                best_params, _ = genetic_optimize_fcm(X_full, c_full, int(max_iter * percentage), true_labels_full)
+                end_time = time.time()
+                
+                runtime = end_time - start_time
+                run_runtimes.append(runtime)
+                
+                chosen_c = int(best_params[-1]) if len(best_params) == 5 else int(c_full)
+                fitness_score = get_fitness_score(chosen_c, max_iter, X_full, true_labels_full, *best_params)
+                run_fitnesses.append(fitness_score)
+            
+            mean_max_fitness = np.mean(run_fitnesses)
+            max_fitness = np.max(run_fitnesses)
+            stddev_fitness = np.std(run_fitnesses)
+            mean_runtime = np.mean(run_runtimes)
+            
+            runtime_improvement_percent = ((baseline_mean_runtime - mean_runtime) / baseline_mean_runtime) * 100 if baseline_mean_runtime > 0 else 0
+            performance_decrease_percent = ((baseline_mean_fitness - mean_max_fitness) / baseline_mean_fitness) * 100 if baseline_mean_fitness > 0 else 0
+
+            rows.append({
+                "dataset": str(dataset_type).split('.')[-1],
+                "percentage": int(percentage * 100),
+                "mean_max_fitness": mean_max_fitness,
+                "max_fitness": max_fitness,
+                "stddev_fitness": stddev_fitness,
+                "runtime_improvement": runtime_improvement_percent,
+                "performance_decrease": performance_decrease_percent
+            })
+
+    # Write markdown file
+    md_lines = []
+    md_lines.append("| Dataset | Percentage | Max Fitness | Mean/Stddev Fitness | Runtime Improvement (%) | Performance Decrease (%) |")
+    md_lines.append("|---|---:|---:|---:|---:|---:|")
+
+    for r in rows:
+        md_lines.append(
+            "| {dataset} | {percentage}% | {max_fitness:.3f} | {mean_max_fitness:.3f} (± {stddev_fitness:.3f}) | {runtime_improvement:.2f} | {performance_decrease:.2f} |"
+            .format(**r)
+        )
+
+    out_path = "maxiter_efficiency_table.md"
+    with open(out_path, "w", encoding="utf-8") as fh:
+        fh.write("\n".join(md_lines))
+
+    print(f"Wrote max iteration efficiency table to {out_path}")
+    return rows
 if __name__ == "__main__":
     #calculate_optimized_hyperparameters()
     #save_clustering_performance_table()
-    plot_fitness_over_generations()
+    #plot_fitness_over_generations()
+    create_maxiter_efficiency_table()
     import sys
     sys.exit()
