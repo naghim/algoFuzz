@@ -12,9 +12,25 @@ def create_centroids(X: NDArray, strategy: CentroidStrategy, num_clusters: int) 
         centroids = np.random.rand(x_size, num_clusters)
         return centroids
 
-    if strategy == CentroidStrategy.Outliers:
+    if strategy == CentroidStrategy.FixedRangeOutliers:
         centroids = (np.random.rand(x_size, num_clusters) * 10) + 10
         return centroids
+
+    if strategy == CentroidStrategy.Outliers:
+        rng = np.random.default_rng(42)  # fixed seed for reproducibility
+        multipliers = rng.uniform(2.0, 5.0, size=(x_size, num_clusters))
+        signs = rng.choice([-1, 1], size=(x_size, num_clusters))
+
+        data_max = np.max(X, axis=1, keepdims=True)
+        data_min = np.min(X, axis=1, keepdims=True)
+        span = data_max - data_min
+        offset = np.where(span == 0, 1.0, span)  # avoid zero span
+
+        above = data_max + offset * multipliers
+        below = data_min - offset * multipliers
+        centroids = np.where(signs == 1, above, below)
+        return centroids
+
 
     if strategy == CentroidStrategy.Diagonal:
         centroids = np.column_stack(
