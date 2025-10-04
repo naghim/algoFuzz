@@ -1,3 +1,4 @@
+from algofuzz import centroid_strategy as centroid_strategy_module, evaluate
 from algofuzz.fcm import *
 from algofuzz.validation import find_best_permutation, purity, normalized_mutual_information, adjusted_rand_index
 from algofuzz.enums import CentroidStrategy, DatasetType, FCMType
@@ -34,8 +35,10 @@ def test_kappa(dataset: DatasetType):
             max_iter=steps,
             kappa=kappa
         )
+        fcm.set_centroids(centroid_strategy_module.create_centroids(X, CentroidStrategy.Random, c))
         fcm.fit(X)
-        conf_matrix = confusion_matrix(true_labels, fcm.labels[:len(true_labels)])
+        predicted_labels = fcm.get_predicted_labels()
+        conf_matrix = confusion_matrix(true_labels, predicted_labels[:len(true_labels)])
         best_permuted_confusion = find_best_permutation(conf_matrix)
 
         PURR = purity(best_permuted_confusion)
@@ -87,44 +90,39 @@ def main(deterministic: bool, dataset: DatasetType, fcm: FCMType, centroid_strat
             p=p,
             eta=eta,
             weight=a,
-            max_iter=steps,
-            centroid_strategy=centroid_strategy
+            max_iter=steps
         )
-    elif fcm == FCMType.NonoptimizedFPCM:
-        fcm = NonoptimizedFPCM(
+    elif fcm == FCMType.FPCM:
+        fcm = FPCM(
             num_clusters=c,
             m=m,
             p=p,
             max_iter=steps,
-            noise=noise,
-            centroid_strategy=centroid_strategy
+            noise=noise
         )
-    elif fcm == FCMType.NonoptimizedGFPCM:
+    elif fcm == FCMType.GFPCM:
         beta = 1
-        fcm = NonoptimizedGFPCM(
+        fcm = GFPCM(
             num_clusters=c,
             m=m,
             p=p,
             w_prob=beta,
             max_iter=steps,
-            noise=noise,
-            centroid_strategy=centroid_strategy
+            noise=noise
         )
     elif fcm == FCMType.FCM:
         fcm = FCM(
             num_clusters=c,
             m=m,
             max_iter=steps,
-            noise=noise,
-            centroid_strategy=centroid_strategy
+            noise=noise
         )
     elif fcm == FCMType.FCPlus1M:
         fcm = FCPlus1M(
             num_clusters=c,
             m=m,
             max_iter=steps,
-            noise=noise,
-            centroid_strategy=centroid_strategy
+            noise=noise
         )
     elif fcm == FCMType.PFCM:
         fcm = PFCM(
@@ -134,50 +132,51 @@ def main(deterministic: bool, dataset: DatasetType, fcm: FCMType, centroid_strat
             preprocess_iter=preprocess_iter,
             p=p,
             a=a,
-            b=b,
-            centroid_strategy=centroid_strategy
+            b=b
         )
-    elif fcm == FCMType.NonoptimizedFP3CM:
-        fcm = NonoptimizedFP3CM(
+    elif fcm == FCMType.FP3CM:
+        fcm = FP3CM(
             num_clusters=c,
             m=m,
             max_iter=steps,
             p=p,
-            eta=eta,
-            centroid_strategy=centroid_strategy
+            eta=eta
         )
     else:
         raise ValueError('Invalid FCM type')
 
+    # Initialize centroids
+    fcm.set_centroids(centroid_strategy_module.create_centroids(X, centroid_strategy, c))
     fcm.fit(X)
 
     # Print the results
     # print()
     #print("Membership matrix:")
-    #print(fcm.member)
+    #print(fcm.get_member())
 
     # if hasattr(fcm, 'alpha'):
     #     print()
     #     print("Alpha values:")
     #     print(fcm.alpha)
-
+    #
     # print()
     # print("Final eta values:")
-    # print(fcm.cluster_eta)
+    # print(fcm.get_eta())
     # print()
     #print("Labels:")
     #print(fcm.labels)
     #print()
 
     #print('fcm shape', fcm.labels.shape)
-    conf_matrix = confusion_matrix(true_labels, fcm.labels[:len(true_labels)])
+    predicted_labels = fcm.get_predicted_labels()
+    conf_matrix = confusion_matrix(true_labels, predicted_labels[:len(true_labels)])
     best_permuted_confusion = find_best_permutation(conf_matrix)
     print(best_permuted_confusion)
     print(np.sum(np.diag(best_permuted_confusion)))
 
-    PUR = purity(best_permuted_confusion)
-    ARI = adjusted_rand_index(best_permuted_confusion)
-    NMI = normalized_mutual_information(best_permuted_confusion)
+    # PUR = purity(best_permuted_confusion)
+    # ARI = adjusted_rand_index(best_permuted_confusion)
+    # NMI = normalized_mutual_information(best_permuted_confusion)
 
     # print("ARI:", ARI)
     # print("NMI:", NMI)
@@ -187,16 +186,19 @@ def main(deterministic: bool, dataset: DatasetType, fcm: FCMType, centroid_strat
     # print()
     #fcm.plot_clusters(X)
 
-    fcm.evaluate_true_labels(true_labels)
+    purity, nmi, ari = evaluate.evaluate_true_labels(predicted_labels, true_labels)
+    print("PUR:", purity)
+    print("NMI:", nmi)
+    print("ARI:", ari)
 
 if __name__ == '__main__':
     strategy = CentroidStrategy.Mirtill
     deterministic = True
     #main(DatasetType.NormalizedBreastCancer, FCMType.FCM, strategy)
     #main(DatasetType.Iris, FCMType.PFCM, strategy)
-    #main(DatasetType.NormalizedBreastCancer, FCMType.NonoptimizedFPCM, strategy)
-    #main(DatasetType.NormalizedBreastCancer, FCMType.NonoptimizedFPCM, strategy)
-    main(deterministic, DatasetType.Glass, FCMType.NonoptimizedFPCM, strategy)
+    #main(DatasetType.NormalizedBreastCancer, FCMType.FPCM, strategy)
+    #main(DatasetType.NormalizedBreastCancer, FCMType.FPCM, strategy)
+    main(deterministic, DatasetType.Iris, FCMType.FCM, strategy)
     # main(DatasetType.Iris, FCMType.PFCM, strategy)
     # main(DatasetType.Iris, FCMType.STPFCM, strategy)
-    # main(DatasetType.Iris, FCMType.NonoptimizedFP3CM, strategy)
+    # main(DatasetType.Iris, FCMType.FP3CM, strategy)

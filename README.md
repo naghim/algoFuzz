@@ -94,11 +94,11 @@ You may choose from the following algorithms currently available in the library:
 
 5. Fuzzy Possibilistic Product Partition C-Means Clustering algorithm proposed by L. Szilágyi & S. Szilágyi in 2014.
 
-- `from algofuzz import NonOptimizedFP3CM`
+- `from algofuzz import FP3CM`
 
 6. Fuzzy-Possibilistic C-Means Clustering algorithm proposed by Pal, Pal and Bezdek in 1997.
 
-- `from algofuzz import NonOptimizedFPCM`
+- `from algofuzz import FPCM`
 
 7. Self-tuning version of the Possibilistic Fuzzy C-Means Clustering algorithm proposed by MB. Naghi in 2023.
 
@@ -106,4 +106,4 @@ You may choose from the following algorithms currently available in the library:
 
 8. Generalized Fuzzy-Possibilistic C-Means Clustering algorithm proposed by MB. Naghi in 2023.
 
-- `from algofuzz import NonOptimizedGFPCM`
+- `from algofuzz import GFPCM`

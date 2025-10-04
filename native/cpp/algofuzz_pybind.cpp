@@ -9,6 +9,7 @@
 #include "FP3CM.h"
 #include "GFPCM.h"
 #include "PFCM.h"
+#include "FPCM.h"
 #include "STPFCM.h"
 #include "DatasetLoader.h"
 
@@ -140,6 +141,19 @@ PYBIND11_MODULE(_algofuzz, m) {
              "Set parameters for the PFCM model from a dictionary")
         .def("fit", &PFCM::fit,
              "Fit the PFCM model to the data",
+             py::arg("X"));
+
+    py::class_<FPCM, GFPCM>(m, "FPCM")
+        .def(py::init<int, int, float, float, float>(),
+             py::arg("num_clusters"),
+             py::arg("max_iter"),
+             py::arg("m") = 2.0f,
+             py::arg("p") = 2.0f,
+             py::arg("noise") = 0.0f)
+        .def("set_parameters", &FPCM::setParameters, // Inherited from GFPCM
+             "Set parameters for the FPCM model from a dictionary")
+        .def("fit", &FPCM::fit, // Inherited from GFPCM
+             "Fit the FPCM model to the data",
              py::arg("X"));
 
     py::class_<Dataset>(m, "Dataset")

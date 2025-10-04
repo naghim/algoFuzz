@@ -1,14 +1,6 @@
-__all__ = ['EtaFCM', 'FCM', 'FCPlus1M', 'NonoptimizedFPCM', 'NonoptimizedGFPCM', 'NonoptimizedFP3CM', 'PFCM', 'STPFCM']
+__all__ = ['EtaFCM', 'FCM', 'FCPlus1M', 'FPCM', 'GFPCM', 'FP3CM', 'PFCM', 'STPFCM']
 
-from .python.base_fcm import BaseFCM
-from .python.eta_fcm import EtaFCM
-from .python.fcm import FCM
-from .python.fcplus1m import FCPlus1M
-from .nonoptimized_fp3cm import NonoptimizedFP3CM
-from .nonoptimized_gfpcm import NonoptimizedGFPCM
-from .nonoptimized_fpcm import NonoptimizedFPCM
-from .possibilistic_fcm import PFCM
-from .python.stpfcm import STPFCM
+from algofuzz._algofuzz import BaseFCM, EtaFCM, FCM, FCPlus1M, FPCM, GFPCM, FP3CM, PFCM, STPFCM
 from algofuzz.enums import FCMType
 
 def get_fcm_by_type(fcm_type: FCMType | str) -> BaseFCM:
@@ -23,9 +15,9 @@ def get_fcm_by_type(fcm_type: FCMType | str) -> BaseFCM:
         return STPFCM
     elif fcm_type == FCMType.PFCM:
         return PFCM
-    elif fcm_type == FCMType.NonoptimizedFP3CM:
-        return NonoptimizedFP3CM
-    elif fcm_type == FCMType.NonoptimizedFPCM:
-        return NonoptimizedFPCM
-    elif fcm_type == FCMType.NonoptimizedGFPCM:
-        return NonoptimizedGFPCM
+    elif fcm_type == FCMType.FP3CM:
+        return FP3CM
+    elif fcm_type == FCMType.FPCM:
+        return FPCM
+    elif fcm_type == FCMType.GFPCM:
+        return GFPCM

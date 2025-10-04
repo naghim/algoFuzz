@@ -3,8 +3,8 @@ import numpy as np
 from algofuzz.datasets import load_dataset
 from algofuzz.enums import CentroidStrategy
 from algofuzz.enums import DatasetType
-from algofuzz.fcm.python.fcm import FCM
-from algofuzz.fcm.possibilistic_fcm import PFCM
+from algofuzz.fcm import FCM
+from algofuzz.fcm import PFCM
 from algofuzz.subset_selector import select_subset
 from deap import base, creator, tools
 from algofuzz._algofuzz import STPFCM
@@ -745,7 +745,7 @@ def create_maxiter_efficiency_table():
     return rows
 if __name__ == "__main__":
     #calculate_optimized_hyperparameters()
-    #save_clustering_performance_table()
+    save_clustering_performance_table()
     #plot_fitness_over_generations()
     create_maxiter_efficiency_table()
     import sys

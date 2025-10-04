@@ -92,9 +92,9 @@ To use any of these algorithms, you can import them as follows:
    from algofuzz import PFCM
    from algofuzz import EtaFCM
    from algofuzz import FCPlus1M
-   from algofuzz import NonOptimizedFP3CM
-   from algofuzz import NonOptimizedFPCM
-   from algofuzz import NonOptimizedGFPCM
+   from algofuzz import FP3CM
+   from algofuzz import FPCM
+   from algofuzz import GFPCM
    from algofuzz import STPFCM
 
 Now, let's create an instance of the FCM algorithm and fit it to the data. We will use the ``fit`` method to compute the clusters and membership values based on the input data.

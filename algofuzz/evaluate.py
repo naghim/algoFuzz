@@ -21,6 +21,8 @@ def evaluate_true_labels(predicted_labels: NDArray, true_labels: NDArray) -> lis
             - Normalized Mutual Information
     """
     if len(predicted_labels) != len(true_labels):
+        print("Predicted labels length:", len(predicted_labels))
+        print("True labels length:", len(true_labels))
         logging.warning("Length of predicted labels does not match length of true labels.")
 
     conf_matrix = confusion_matrix(true_labels, predicted_labels[:len(true_labels)])

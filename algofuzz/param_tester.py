@@ -1,4 +1,6 @@
+from algofuzz import centroid_strategy, evaluate
 from algofuzz.datasets import load_dataset
+from algofuzz.enums import CentroidStrategy
 from algofuzz.exceptions import MultivariateParamTesterException
 from algofuzz.fcm import get_fcm_by_type
 from scipy.io import savemat
@@ -219,15 +221,17 @@ class MultivariateParamTester(object):
 
         # Fit model
         start_time = time.time()
+        fcm.set_centroids(centroid_strategy.create_centroids(X, CentroidStrategy.Random, num_clusters))
         fcm.fit(X)
         duration = time.time() - start_time
 
         # Evaluate performance
-        purity, nmi, ari = fcm.evaluate_true_labels(true_labels)
+        predicted_labels = fcm.get_predicted_labels()
+        purity, nmi, ari = evaluate.evaluate_true_labels(predicted_labels, true_labels)
         csv_item = [value.name if hasattr(value, 'name') else value for value in item]
 
         try:
-            eta = list(fcm.cluster_eta)
+            eta = list(fcm.get_eta())
         except:
             eta = None
 
