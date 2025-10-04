@@ -16,7 +16,7 @@ public:
 
     void setParameters(const std::unordered_map<std::string, double>& params) override;
 
-    void fit(const Eigen::MatrixXd &X);
+    virtual void fit(const Eigen::MatrixXd &X);
 
 protected:
     float kappa; ///< Regulates the severity of the penalty factor eta. The default value is 1.0. Must be greater than or equal to 1.

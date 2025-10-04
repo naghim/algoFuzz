@@ -3,7 +3,7 @@ import numpy as np
 from algofuzz.datasets import load_dataset
 from algofuzz.enums import CentroidStrategy
 from algofuzz.enums import DatasetType
-from algofuzz.fcm.fcm import FCM
+from algofuzz.fcm.python.fcm import FCM
 from algofuzz.fcm.possibilistic_fcm import PFCM
 from algofuzz.subset_selector import select_subset
 from deap import base, creator, tools

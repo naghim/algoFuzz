@@ -1,9 +1,9 @@
 __all__ = ['EtaFCM', 'FCM', 'FCPlus1M', 'NonoptimizedFPCM', 'NonoptimizedGFPCM', 'NonoptimizedFP3CM', 'PFCM', 'STPFCM']
 
 from .python.base_fcm import BaseFCM
-from .eta_fcm import EtaFCM
-from .fcm import FCM
-from .fcplus1m import FCPlus1M
+from .python.eta_fcm import EtaFCM
+from .python.fcm import FCM
+from .python.fcplus1m import FCPlus1M
 from .nonoptimized_fp3cm import NonoptimizedFP3CM
 from .nonoptimized_gfpcm import NonoptimizedGFPCM
 from .nonoptimized_fpcm import NonoptimizedFPCM

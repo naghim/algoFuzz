@@ -3,7 +3,7 @@ This module contains the implementation of the F(C+1)M algorithm, which is an ex
 """
 
 from pydantic import Field
-from algofuzz.fcm.fcm import FCM
+from algofuzz.fcm.python.fcm import FCM
 
 class FCPlus1M(FCM):
     """

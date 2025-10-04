@@ -2,7 +2,7 @@
 This model is an extension of the FCM model that includes a penalty term (eta) for each cluster: provides the default implementation of the fit method that calculates the eta parameter for each cluster based on the membership matrix and the centroids of the clusters. 
 """
 
-from algofuzz.fcm.fcm import FCM
+from algofuzz.fcm.python.fcm import FCM
 from numpy.typing import NDArray
 import numpy as np
 

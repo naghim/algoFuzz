@@ -5,6 +5,7 @@
 #include "BaseFCM.h"
 #include "FCM.h"
 #include "FCPlus1M.h"
+#include "EtaFCM.h"
 #include "STPFCM.h"
 #include "DatasetLoader.h"
 
@@ -78,6 +79,21 @@ PYBIND11_MODULE(_algofuzz, m) {
         .def("fit", &FCPlus1M::fit,
              "Fit the FCPlus1M model to the data",
              py::arg("X"));
+
+    py::class_<EtaFCM, FCM>(m, "EtaFCM")
+        .def(py::init<int, int, float, float, float>(),
+             py::arg("num_clusters"),
+             py::arg("max_iter"),
+             py::arg("m") = 2.0f,
+             py::arg("kappa") = 1.0f,
+             py::arg("noise") = 0.0f)
+        .def("set_parameters", &EtaFCM::setParameters,
+             "Set parameters for the EtaFCM model from a dictionary")
+        .def("fit", &EtaFCM::fit,
+             "Fit the EtaFCM model to the data",
+             py::arg("X"))
+        .def("get_eta", &EtaFCM::getEta,
+             "Get the eta vector");
 
     py::class_<Dataset>(m, "Dataset")
         .def_readwrite("X", &Dataset::X)
