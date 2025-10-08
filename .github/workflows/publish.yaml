@@ -59,16 +59,17 @@ jobs:
             unzip eigen.zip -d eigen_temp
             echo "EIGEN3_INCLUDE_DIR=$(pwd)/eigen_temp/eigen-5.0.0" >> $GITHUB_ENV
             echo "Eigen3_DIR=$(pwd)/eigen_temp/eigen-5.0.0" >> $GITHUB_ENV
-            # Write a minimal Eigen3Config.cmake for header-only Eigen on Windows
-            cat <<EOF
-            set(_eigen3_include_dir "$(pwd)/eigen_temp/eigen-5.0.0")
-            add_library(Eigen3::Eigen INTERFACE IMPORTED)
-            set_target_properties(Eigen3::Eigen PROPERTIES
-              INTERFACE_INCLUDE_DIRECTORIES "${_eigen3_include_dir}"
-            )
-            set(EIGEN3_VERSION_STRING "5.0.0")
-            set(EIGEN3_INCLUDE_DIR "${_eigen3_include_dir}")
-            EOF > eigen_temp/eigen-5.0.0/Eigen3Config.cmake
+
+            cat <<EOF > eigen_temp/eigen-5.0.0/Eigen3Config.cmake
+              set(_eigen3_include_dir "$(pwd)/eigen_temp/eigen-5.0.0")
+              add_library(Eigen3::Eigen INTERFACE IMPORTED)
+              set_target_properties(Eigen3::Eigen PROPERTIES
+                INTERFACE_INCLUDE_DIRECTORIES "${_eigen3_include_dir}"
+              )
+              set(EIGEN3_VERSION_STRING "5.0.0")
+              set(EIGEN3_INCLUDE_DIR "${_eigen3_include_dir}")
+            EOF
+
           fi
       - name: Build binary wheel and source tarball
         shell: bash
