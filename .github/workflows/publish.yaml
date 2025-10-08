@@ -64,7 +64,9 @@ jobs:
         shell: bash
         env:
           SKBUILD_CMAKE_DEFINE: "-DEigen3_DIR=${{ env.Eigen3_DIR }};-DEIGEN3_INCLUDE_DIR=${{ env.EIGEN3_INCLUDE_DIR }}"
-        run: python -m build --wheel --outdir dist/ .
+        run: |
+          echo "Defined: SKBUILD_CMAKE_DEFINE=${SKBUILD_CMAKE_DEFINE}"
+          python -m build --wheel --outdir dist/ .
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
