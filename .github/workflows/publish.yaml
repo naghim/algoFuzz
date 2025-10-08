@@ -12,7 +12,7 @@ jobs:
     strategy:
       matrix:
         os: ["ubuntu-latest", "windows-latest"]
-        python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
+        python-version: ["3.10", "3.11", "3.12"]
 
     steps:
       - uses: actions/checkout@v5
@@ -25,10 +25,10 @@ jobs:
           python -m pip install --upgrade pip
           pip install build
           # Additional dependencies for native extensions if any
-          if contains(matrix.os, 'ubuntu'); then
+          if ${{ contains(matrix.os, 'ubuntu') }}; then
             sudo apt-get update
             sudo apt-get install -y libeigen3-dev
-          elif contains(matrix.os, 'windows'); then
+          elif ${{ contains(matrix.os, 'windows') }}; then
             # Download Eigen for Windows
             echo "Downloading Eigen for Windows..."
             curl -L https://gitlab.com/libeigen/eigen/-/archive/5.0.0/eigen-5.0.0.zip -o eigen.zip
