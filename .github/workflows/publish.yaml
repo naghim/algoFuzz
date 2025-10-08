@@ -35,6 +35,7 @@ jobs:
             curl -L https://gitlab.com/libeigen/eigen/-/archive/5.0.0/eigen-5.0.0.zip -o eigen.zip
             unzip eigen.zip -d eigen_temp
             echo "EIGEN3_INCLUDE_DIR=$(pwd)/eigen_temp/eigen-5.0.0" >> $GITHUB_ENV
+            echo "Eigen3_DIR=$(pwd)/eigen_temp/eigen-5.0.0/cmake" >> $GITHUB_ENV
           fi
       - name: Build binary wheel and source tarball
         shell: bash
