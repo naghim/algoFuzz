@@ -32,7 +32,7 @@ jobs:
     runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        os: ["ubuntu-latest", "windows-latest"]
+        os: ["windows-latest"]
         python-version: ["3.10", "3.11", "3.12", "3.13", "3.14"]
 
     steps:
@@ -63,7 +63,7 @@ jobs:
       - name: Build binary wheel and source tarball
         shell: bash
         env:
-          SKBUILD_CMAKE_ARGS: "-DEigen3_DIR=${{ env.Eigen3_DIR }};-DEIGEN3_INCLUDE_DIR=${{ env.EIGEN3_INCLUDE_DIR }}"
+          SKBUILD_CMAKE_ARGS: "-DCMAKE_PREFIX_PATH=${{ env.Eigen3_DIR }};-DEIGEN3_INCLUDE_DIR=${{ env.EIGEN3_INCLUDE_DIR }}"
         run: |
           echo "Defined: SKBUILD_CMAKE_ARGS=${SKBUILD_CMAKE_ARGS}"
           python -m build --wheel --outdir dist/ .
