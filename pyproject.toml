@@ -28,7 +28,7 @@ dependencies = [
 "Bug Tracker" = "https://github.com/naghim/algofuzz/issues"
 
 [build-system]
-requires = ["scikit-build-core", "cmake>=3.18", "ninja>=1.10", "pybind11>=3.0.1"]
+requires = ["scikit-build-core", "pybind11"]
 build-backend = "scikit_build_core.build"
 
 [tool.scikit-build]
