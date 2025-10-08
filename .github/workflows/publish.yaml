@@ -21,6 +21,7 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
       - name: Install dependencies
+        shell: bash
         run: |
           python -m pip install --upgrade pip
           pip install build
@@ -36,6 +37,7 @@ jobs:
             echo "EIGEN3_INCLUDE_DIR=$(pwd)/eigen_temp/eigen-5.0.0" >> $GITHUB_ENV
           fi
       - name: Build binary wheel and source tarball
+        shell: bash
         run: python -m build --sdist --wheel --outdir dist/ .
       - name: Upload artifact
         uses: actions/upload-artifact@v4
@@ -55,6 +57,7 @@ jobs:
         with:
           path: all-dists
       - name: List downloaded files
+        shell: bash
         run: ls -R all-dists
       - name: Publish to PyPI
         uses: pypa/gh-action-pypi-publish@release/v1
